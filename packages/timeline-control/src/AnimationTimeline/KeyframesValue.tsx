@@ -1,10 +1,13 @@
-import React, { useRef, useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState, useContext } from 'react';
 import { KeyframesValueCell } from './KeyframesValueCell';
 import './style.less';
 import KeyframesValueParams from './types/KeyframesValueParams';
 import { clamp } from 'lodash';
+import { TimeValueMapContext } from './jotai/timeValue';
 
 export function KeyframesValue(props: KeyframesValueParams) {
+
+  let { timeMap, setTimeMap } = useContext(TimeValueMapContext);
 
   const { zoom } = props;
 
@@ -42,6 +45,16 @@ export function KeyframesValue(props: KeyframesValueParams) {
     setMaxCell(set_max_cell);
   }, [scale_width])
 
+  useEffect(() => {
+    let map = {};
+    const items = keyframes_area_ref.current?.querySelectorAll('.keyframes_values_cell') as unknown as HTMLElement[];
+    items?.forEach((v, idx: number) => {
+      map = Object.assign({}, map, { [idx * 100]: v.offsetLeft });
+    });
+    setTimeMap(map);
+
+  }, [zoom, max_cell])
+
   const getcolumnwidth = () => {
     return scale_width / scale_split_count;
   }
@@ -49,14 +62,11 @@ export function KeyframesValue(props: KeyframesValueParams) {
   const gridColumnRender = () => {
     const cells: any[] = [];
     let label = 0;
-
     for (let i = 0; i < max_cell; i++) {
       const isLabel = i % scale_split_count == 0;
+      const item = <KeyframesValueCell key={i} showLabel={isLabel} label={`${label}S`} />
+      cells.push(item);
       if (isLabel) label++;
-
-      cells.push(
-        <KeyframesValueCell key={i} showLabel={isLabel} label={`${label}S`} />
-      );
     }
     return cells;
   }
@@ -67,6 +77,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
     <div className='keyframes_values' ref={keyframes_area_ref}
       style={{ gridTemplateColumns: `repeat(auto-fill, ${getcolumnwidth()}px)` }}>
       {gridColumnRender()}
+
     </div>
   );
 }
