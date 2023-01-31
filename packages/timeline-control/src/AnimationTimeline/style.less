@@ -1,0 +1,26 @@
+.keyframes_area{
+  position: relative;
+  overflow: scroll;
+  width: 100%;
+  min-height: 300px;
+  padding-top: 20px;
+  outline: none;
+}
+
+.keyframes_values{
+  display: grid;
+  position: relative;
+  &_cell{
+    position: relative;
+    border-right: 1px solid #999;
+    align-self: end;
+    .tip{
+      position: absolute;
+      top: -20px;
+      left: 100%;
+      transform: translateX(-50%);
+      font-size: 14px;
+      color: #333;
+    }
+  }
+}
