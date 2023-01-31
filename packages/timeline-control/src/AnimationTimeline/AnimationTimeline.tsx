@@ -1,44 +1,59 @@
 import './style.less';
-import React, { KeyboardEvent, useRef, useState } from 'react';
+import React, { KeyboardEvent, useEffect, useRef, useState, WheelEvent } from 'react';
 import { KeyframesArea } from './KeyframesArea';
 import { KeyframesValue } from './KeyframesValue';
 import { TimeValueMapContext } from './jotai/timeValue';
-import { throttle } from 'lodash';
+import { clamp } from 'lodash';
 
 export function AnimationTimeline() {
 
   const [timeMap, setTimeMap] = useState({});
+  const [boxWidth, setBoxWidth] = useState(0);
 
   const [zoom, setZoom] = useState(1);
-  const curWidth = useRef(0);
+  const doKeyCode = useRef('');
 
-  const handelWheel = throttle((deltaY, zoom) => {
-    zoom += deltaY * -0.1;
-    setZoom(Math.min(Math.max(.125, zoom), 4));
-  }, 1000 / 24);
+  const handelWheel = (deltaY: number, zoom: number) => {
+    zoom += deltaY * -0.01;
+    setZoom(clamp(zoom, -2, 2));
+  };
 
   const keyframes_area_ref = useRef<HTMLDivElement>(null);
 
-  const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
-    const cur = keyframes_area_ref.current as HTMLDivElement;
-    const keyCode = 'Shift';
-    const curZoom = zoom;
-    curWidth.current = cur.clientWidth;
-    cur.onwheel = (wheel) => {
-      if (keyCode == e.key) {
-        handelWheel(wheel.deltaY, curZoom);
-      }
-    }
+  const onWheel = (e: WheelEvent<HTMLDivElement>) => {
+    const wheel = e;
+    const keyCode = 'Control';
 
-    cur.onkeyup = () => {
-      cur.onwheel = null;
+    if (doKeyCode.current == keyCode) {
+      handelWheel(wheel.deltaY, zoom);
     }
   };
 
+  useEffect(() => {
+
+    const onKeyDown = (e: globalThis.KeyboardEvent): void => {
+      doKeyCode.current = e.key;
+    };
+
+    document.body.addEventListener('keydown', onKeyDown);
+
+    const onKeyUp = (e: globalThis.KeyboardEvent): void => {
+      doKeyCode.current = '';
+    };
+
+    document.body.addEventListener('keyup', onKeyUp)
+
+    return () => {
+      document.body.removeEventListener('keydown', onKeyUp);
+      document.body.removeEventListener('keyup', onKeyUp);
+    }
+
+  }, [])
+
 
   return (
-    <TimeValueMapContext.Provider value={{ timeMap, setTimeMap }}>
-      <div tabIndex={0} className='keyframes_area' onKeyDown={onKeyDown} ref={keyframes_area_ref}>
+    <TimeValueMapContext.Provider value={{ timeMap, setTimeMap, boxWidth, setBoxWidth }}>
+      <div tabIndex={0} className='keyframes_area_box' onWheel={onWheel} ref={keyframes_area_ref}>
         <KeyframesValue zoom={zoom} />
         <KeyframesArea zoom={zoom} />
       </div>

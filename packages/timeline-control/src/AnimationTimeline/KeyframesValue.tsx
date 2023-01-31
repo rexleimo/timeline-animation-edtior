@@ -7,7 +7,7 @@ import { TimeValueMapContext } from './jotai/timeValue';
 
 export function KeyframesValue(props: KeyframesValueParams) {
 
-  let { timeMap, setTimeMap } = useContext(TimeValueMapContext);
+  let { setTimeMap, setBoxWidth } = useContext(TimeValueMapContext);
 
   const { zoom } = props;
 
@@ -30,8 +30,14 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
   useEffect(() => {
     const cur = keyframes_area_ref.current as HTMLElement;
-    const zoomWidth = clamp(cur?.clientWidth * zoom, document.body.clientWidth, document.body.clientWidth * 20);
+    console.log(zoom);
+
+    const diff = cur.clientWidth * zoom;
+
+
+    const zoomWidth = clamp(cur?.clientWidth + diff, document.body.clientWidth, document.body.clientWidth * 2);
     cur.style.width = `${Math.ceil(zoomWidth)}px`;
+    setBoxWidth(cur.clientWidth);
 
     setScaleWidth((pre) => {
       return Math.min(Math.max(160 / 4, pre * zoom), 160 * 4);
@@ -41,16 +47,17 @@ export function KeyframesValue(props: KeyframesValueParams) {
   useEffect(() => {
     const cur = keyframes_area_ref.current as HTMLElement;
     const cell_width = Math.ceil(cur.clientWidth / getcolumnwidth());
-    const set_max_cell = cell_width % 2 === 0 ? cell_width : cell_width - 1;
-    setMaxCell(set_max_cell);
+    setMaxCell(cell_width);
   }, [scale_width])
 
   useEffect(() => {
+
     let map = {};
     const items = keyframes_area_ref.current?.querySelectorAll('.keyframes_values_cell') as unknown as HTMLElement[];
     items?.forEach((v, idx: number) => {
       map = Object.assign({}, map, { [idx * 100]: v.offsetLeft });
     });
+
     setTimeMap(map);
 
   }, [zoom, max_cell])
@@ -74,8 +81,8 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
   return (
 
-    <div className='keyframes_values' ref={keyframes_area_ref}
-      style={{ gridTemplateColumns: `repeat(auto-fill, ${getcolumnwidth()}px)` }}>
+    <div className='keyframes_values' ref={keyframes_area_ref}>
+
       {gridColumnRender()}
 
     </div>

@@ -7,7 +7,9 @@ import React from "react";
 export const TimeValueMapContext = React.createContext<
   {
     timeMap: { [x: number]: number },
-    setTimeMap?: any
+    setTimeMap?: any,
+    boxWidth?: number,
+    setBoxWidth?: any
   }
 >(
   {
