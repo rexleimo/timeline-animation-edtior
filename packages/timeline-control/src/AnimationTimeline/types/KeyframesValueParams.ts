@@ -1,3 +1,3 @@
 export default interface KeyframesValueParams {
-  zoom: number;
+  zoom?: number;
 }

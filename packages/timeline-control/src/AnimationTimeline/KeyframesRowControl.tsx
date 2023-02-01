@@ -82,6 +82,9 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   }
 
   useEffect(() => {
+
+    if(keyframesInfo.length === 0) return;
+
     const cur = controlRef.current as HTMLDivElement;
     const min = minBy(keyframesInfo, (o) => o.value) as KeyframesData;
     const max = maxBy(keyframesInfo, (o) => o.value) as KeyframesData;
@@ -95,6 +98,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   }, [zoom, timeMap])
 
   return (
+
+
     <div className="row" ref={curRef}>
 
       <div
