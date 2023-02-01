@@ -4,8 +4,11 @@ import { KeyframesArea } from './KeyframesArea';
 import { KeyframesValue } from './KeyframesValue';
 import { TimeValueMapContext } from './jotai/timeValue';
 import { clamp } from 'lodash';
+import { AnimationMoveLine } from './AnimationMoveLine';
+
 
 export function AnimationTimeline() {
+
 
   const [timeMap, setTimeMap] = useState({});
   const [boxWidth, setBoxWidth] = useState(0);
@@ -51,11 +54,14 @@ export function AnimationTimeline() {
   }, [])
 
 
+
+
   return (
     <TimeValueMapContext.Provider value={{ timeMap, setTimeMap, boxWidth, setBoxWidth }}>
       <div tabIndex={0} className='keyframes_area_box' onWheel={onWheel} ref={keyframes_area_ref}>
         <KeyframesValue zoom={zoom} />
         <KeyframesArea zoom={zoom} />
+        <AnimationMoveLine />
       </div>
     </TimeValueMapContext.Provider>
 

@@ -1,15 +1,18 @@
-import React, { useRef, useEffect, useState, useContext } from 'react';
+import React, { useRef, useEffect, useState, useContext, MouseEvent } from 'react';
 import { KeyframesValueCell } from './KeyframesValueCell';
 import './style.less';
 import KeyframesValueParams from './types/KeyframesValueParams';
 import { clamp } from 'lodash';
 import { TimeValueMapContext } from './jotai/timeValue';
+import { useAtom } from 'jotai';
+import CurClientXEvents from './jotai/curClientXEvnet';
 
 export function KeyframesValue(props: KeyframesValueParams) {
 
   let { setTimeMap, setBoxWidth } = useContext(TimeValueMapContext);
+  const [, setClientX] = useAtom(CurClientXEvents);
 
-  const { zoom } = props;
+  const { zoom = 1 } = props;
 
   const keyframes_area_ref = useRef<HTMLDivElement>(null);
   const [max_cell, setMaxCell] = useState<number>(0);
@@ -30,12 +33,11 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
   useEffect(() => {
     const cur = keyframes_area_ref.current as HTMLElement;
-    console.log(zoom);
 
-    const diff = cur.clientWidth * zoom;
+    const curWidth = cur.clientWidth;
+    const diff = curWidth * zoom;
 
-
-    const zoomWidth = clamp(cur?.clientWidth + diff, document.body.clientWidth, document.body.clientWidth * 2);
+    const zoomWidth = clamp(curWidth + diff, document.body.clientWidth, document.body.clientWidth * 2);
     cur.style.width = `${Math.ceil(zoomWidth)}px`;
     setBoxWidth(cur.clientWidth);
 
@@ -55,7 +57,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
     let map = {};
     const items = keyframes_area_ref.current?.querySelectorAll('.keyframes_values_cell') as unknown as HTMLElement[];
     items?.forEach((v, idx: number) => {
-      map = Object.assign({}, map, { [idx * 100]: v.offsetLeft });
+      map = Object.assign({}, map, { [idx * 100]: getcolumnwidth() * (idx + 1) + 1 });
     });
 
     setTimeMap(map);
@@ -71,17 +73,24 @@ export function KeyframesValue(props: KeyframesValueParams) {
     let label = 0;
     for (let i = 0; i < max_cell; i++) {
       const isLabel = i % scale_split_count == 0;
-      const item = <KeyframesValueCell key={i} showLabel={isLabel} label={`${label}S`} />
+      const item = <KeyframesValueCell key={i} showLabel={isLabel} label={`${label}S`} left={getcolumnwidth() * (i + 1)} />
       cells.push(item);
       if (isLabel) label++;
     }
     return cells;
   }
 
+  const onClick = (e: MouseEvent<HTMLDivElement>) => {
+    const clientX = e.clientX;
+    const scrollLeft = document.querySelector('.keyframes_area_box')?.scrollLeft; 
+    const ceil = Math.ceil(scrollLeft as number); 
+    setClientX(clientX + ceil);
+  }
+
 
   return (
 
-    <div className='keyframes_values' ref={keyframes_area_ref}>
+    <div className='keyframes_values' ref={keyframes_area_ref} onClick={onClick}>
 
       {gridColumnRender()}
 

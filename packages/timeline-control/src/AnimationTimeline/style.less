@@ -3,6 +3,7 @@
   padding-top: 20px;
   overflow: scroll;
   outline: none;
+  position: relative;
   
   ::-webkit-scrollbar{
     display: none;
@@ -14,7 +15,6 @@
   position: relative;
   width: 100%;
   min-height: 300px;
-  padding-top: 20px;
   outline: none;
 
   ::-webkit-scrollbar{
@@ -75,13 +75,12 @@
 }
 
 .keyframes_values{
-  display: flex;
   position: relative;
+  height: 20px;
   &_cell{
-    position: relative;
+    position: absolute;
     border-right: 1px solid #999;
     align-self: end;
-    width: 16px;
     .tip{
       position: absolute;
       top: -20px;
@@ -90,5 +89,8 @@
       font-size: 14px;
       color: #333;
     }
+  }
+  &:hover{
+    cursor: pointer;
   }
 }
