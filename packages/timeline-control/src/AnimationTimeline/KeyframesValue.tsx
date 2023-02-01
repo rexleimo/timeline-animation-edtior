@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useContext, MouseEvent } from 'reac
 import { KeyframesValueCell } from './KeyframesValueCell';
 import './style.less';
 import KeyframesValueParams from './types/KeyframesValueParams';
-import { clamp } from 'lodash';
+import { ceil, clamp } from 'lodash';
 import { TimeValueMapContext } from './jotai/timeValue';
 import { useAtom } from 'jotai';
 import CurClientXEvents from './jotai/curClientXEvnet';
@@ -54,10 +54,10 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
   useEffect(() => {
 
-    let map = {};
+    let map = new Map<number, number>();
     const items = keyframes_area_ref.current?.querySelectorAll('.keyframes_values_cell') as unknown as HTMLElement[];
-    items?.forEach((v, idx: number) => {
-      map = Object.assign({}, map, { [idx * 100]: getcolumnwidth() * (idx + 1) + 1 });
+    items?.forEach((_, idx: number) => {
+      map.set(ceil(idx * 100 / zoom, 1), getcolumnwidth() * (idx + 1) + 1);
     });
 
     setTimeMap(map);
@@ -73,7 +73,8 @@ export function KeyframesValue(props: KeyframesValueParams) {
     let label = 0;
     for (let i = 0; i < max_cell; i++) {
       const isLabel = i % scale_split_count == 0;
-      const item = <KeyframesValueCell key={i} showLabel={isLabel} label={`${label}S`} left={getcolumnwidth() * (i + 1)} />
+      const capLabel = ceil(label / zoom, 1);
+      const item = <KeyframesValueCell key={i} showLabel={isLabel} label={`${capLabel}S`} left={getcolumnwidth() * (i + 1)} />
       cells.push(item);
       if (isLabel) label++;
     }
@@ -82,8 +83,8 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
   const onClick = (e: MouseEvent<HTMLDivElement>) => {
     const clientX = e.clientX;
-    const scrollLeft = document.querySelector('.keyframes_area_box')?.scrollLeft; 
-    const ceil = Math.ceil(scrollLeft as number); 
+    const scrollLeft = document.querySelector('.keyframes_area_box')?.scrollLeft;
+    const ceil = Math.ceil(scrollLeft as number);
     setClientX(clientX + ceil);
   }
 

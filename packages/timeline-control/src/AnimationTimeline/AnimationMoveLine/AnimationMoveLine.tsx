@@ -11,7 +11,7 @@ export function AnimationMoveLine() {
   const lineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const left = timeMap[0];
+    const left = timeMap.get(0) as number;
 
     const cur = lineRef.current as HTMLDivElement;
     cur.style.left = `${Math.floor(left - 2)}px`;
@@ -29,14 +29,17 @@ export function AnimationMoveLine() {
       const targetLeft = startLeft + diff;
       let timeKey;
       // 向上取整 给 row
-      for (const key in timeMap) {
-        const val = timeMap[key];
-        if (targetLeft < val) {
+
+      for (const [key, val] of timeMap.entries()) {
+
+        if (targetLeft <= val) {
           timeKey = key;
-          cur.style.left = `${val}px`;
+          cur.style.left = `${val - 2}px`;
           break;
         }
+
       }
+
       console.log(timeKey);
 
     }

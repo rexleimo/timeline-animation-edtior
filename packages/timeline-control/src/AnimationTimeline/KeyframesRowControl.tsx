@@ -57,18 +57,18 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   }
 
   const onMouseLeft = (e: MouseEvent<HTMLDivElement>) => {
-    
+
     const cur = e.target as HTMLDivElement;
     cur.classList.add('active');
 
     const control = controlRef.current as HTMLDivElement;
     const startX = control.offsetLeft;
-    
+
     const startWidth = control.clientWidth;
 
     document.onmousemove = (e) => {
       const clientX = e.clientX;
-      const targetWidth =  startX - clientX + startWidth;
+      const targetWidth = startX - clientX + startWidth;
       control.style.width = `${targetWidth}px`;
       control.style.left = `${clientX}px`;
     }
@@ -81,19 +81,36 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
 
   }
 
+  function getTargetClientX(min: KeyframesData): number {
+    let resultX;
+    let pre;
+    for (const [time, x] of timeMap.entries()) {
+      if (min.value <= time) {
+        resultX = pre;
+        break;
+      }
+      pre = x;
+    }
+    return resultX as number;
+  }
+
   useEffect(() => {
 
-    if(keyframesInfo.length === 0) return;
+    if (keyframesInfo.length === 0) return;
 
     const cur = controlRef.current as HTMLDivElement;
     const min = minBy(keyframesInfo, (o) => o.value) as KeyframesData;
     const max = maxBy(keyframesInfo, (o) => o.value) as KeyframesData;
+    const startX = getTargetClientX(min);
+    const endX = getTargetClientX(max);
 
-    const startX = timeMap[min.value] as number;
-    const endX = timeMap[max.value] as number;
     const wdith = endX - startX;
+
+    // timeMap.values().next().value;
+    const f_value = timeMap.values().next().value;
+
     cur.style.width = `${wdith}px`;
-    cur.style.left = `${startX + timeMap[100]}px`;
+    cur.style.left = `${startX + f_value}px`;
 
   }, [zoom, timeMap])
 
@@ -107,10 +124,13 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
         ref={controlRef}
       >
         <div className="left_btn control_btn" onMouseDown={onMouseLeft}></div>
-        <div className="line" onMouseDown={moveControl}></div>
+        {/* <div className="line" onMouseDown={moveControl}></div> */}
+        <div className="line"></div>
         <div className="right_btn control_btn" onMouseDown={onMouseDown}></div>
       </div>
 
     </div>
   );
+
+
 }

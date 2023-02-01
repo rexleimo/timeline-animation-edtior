@@ -10,7 +10,7 @@ import { AnimationMoveLine } from './AnimationMoveLine';
 export function AnimationTimeline() {
 
 
-  const [timeMap, setTimeMap] = useState({});
+  const [timeMap, setTimeMap] = useState(new Map());
   const [boxWidth, setBoxWidth] = useState(0);
 
   const [zoom, setZoom] = useState(1);
@@ -18,7 +18,7 @@ export function AnimationTimeline() {
 
   const handelWheel = (deltaY: number, zoom: number) => {
     zoom += deltaY * -0.01;
-    setZoom(clamp(zoom, -2, 2));
+    setZoom(clamp(zoom, 0.1, 10));
   };
 
   const keyframes_area_ref = useRef<HTMLDivElement>(null);

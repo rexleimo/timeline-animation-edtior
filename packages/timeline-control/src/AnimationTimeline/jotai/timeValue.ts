@@ -6,13 +6,13 @@ import React from "react";
  */
 export const TimeValueMapContext = React.createContext<
   {
-    timeMap: { [x: number]: number },
+    timeMap: Map<number, number>,
     setTimeMap?: any,
     boxWidth?: number,
     setBoxWidth?: any
   }
 >(
   {
-    timeMap: {}
+    timeMap: new Map()
   }
 );

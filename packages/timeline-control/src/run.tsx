@@ -12,17 +12,17 @@ root.render(<AnimationTimelineBox rows={
           value: 100,
         },
         {
-          value: 1000
+          value: 200
         }
       ]
     },
     {
       keyframesInfo: [
         {
-          value: 700,
+          value: 100,
         },
         {
-          value: 6000
+          value: 400
         }
       ]
     }
