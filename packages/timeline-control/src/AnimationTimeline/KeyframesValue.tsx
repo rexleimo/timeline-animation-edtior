@@ -73,7 +73,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
     let label = 0;
     for (let i = 0; i < max_cell; i++) {
       const isLabel = i % scale_split_count == 0;
-      const capLabel = ceil(label / zoom, 1);
+      const capLabel = ceil(label / zoom, 3);
       const item = <KeyframesValueCell key={i} showLabel={isLabel} label={`${capLabel}S`} left={getcolumnwidth() * (i + 1)} />
       cells.push(item);
       if (isLabel) label++;

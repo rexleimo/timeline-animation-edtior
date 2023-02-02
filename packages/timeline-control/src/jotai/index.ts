@@ -1,0 +1,2 @@
+
+export { useAtomAnimationConfig } from './AnimationData';

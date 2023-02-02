@@ -5,6 +5,8 @@ import { KeyframesValue } from './KeyframesValue';
 import { TimeValueMapContext } from './jotai/timeValue';
 import { clamp } from 'lodash';
 import { AnimationMoveLine } from './AnimationMoveLine';
+import { ZoomControl } from './AnimationFooter/ZoomControl/ZoomControl';
+import { AnimationTimeLineFooter } from './AnimationFooter';
 
 
 export function AnimationTimeline() {
@@ -62,6 +64,9 @@ export function AnimationTimeline() {
         <KeyframesValue zoom={zoom} />
         <KeyframesArea zoom={zoom} />
         <AnimationMoveLine />
+
+        <AnimationTimeLineFooter/>
+
       </div>
     </TimeValueMapContext.Provider>
 

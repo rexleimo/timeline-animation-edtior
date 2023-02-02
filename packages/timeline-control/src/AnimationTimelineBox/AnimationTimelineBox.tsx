@@ -3,6 +3,7 @@ import { AnimationTimeline } from '../AnimationTimeline';
 import { AnimationTimelineBoxParams } from './types/AnimationTimelineBox';
 import { useAtom } from 'jotai';
 import { AnimationData } from '../jotai/AnimationData';
+import { AnimationTimelineHeader } from '../AnimationTimelineHeader';
 
 export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
 
@@ -15,7 +16,8 @@ export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
   }, [rows])
 
   return (
-    <>
+    <> 
+      <AnimationTimelineHeader />
       <AnimationTimeline />
     </>
   );
