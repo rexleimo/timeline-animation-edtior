@@ -1,7 +1,8 @@
 import React, { useRef, MouseEvent } from "react";
 import './style.less';
-import { clamp, curry } from 'lodash';
+import { clamp, ceil } from 'lodash';
 import { useAtomAnimationConfig } from "../../../jotai";
+import { ConfigMapKey, ConfigMapKeyNumValueNum } from "../../../jotai/AnimationData";
 
 export function ZoomControl() {
 
@@ -19,14 +20,23 @@ export function ZoomControl() {
       const endX = m.clientX;
       const diff = endX - startX;
 
-      console.log(diff);
+      const maxStartX = cur.offsetWidth;
+      const targetLeft = clamp(diff - startWidth, 0, maxStartX - axis.clientWidth);
+
+      axis.style.left = `${targetLeft}px`;
+
+      const option = ceil(targetLeft / cur.clientWidth, 1) * 10;
+
+      const zoomControlOption = config.get(ConfigMapKey.ZoomOpiont) as ConfigMapKeyNumValueNum;
+      const targetZoom = zoomControlOption.get(option);
+
+      console.log(targetZoom);
       
 
-      const maxStartX = cur.offsetWidth;
-      const targetWidth = clamp(diff - startWidth, 0, maxStartX - axis.clientWidth);
 
-      axis.style.left = `${targetWidth}px`;
     }
+
+
 
     document.onmouseup = function (e) {
       document.onmousemove = null;

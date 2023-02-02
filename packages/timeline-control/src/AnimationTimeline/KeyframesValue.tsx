@@ -71,6 +71,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
   const gridColumnRender = () => {
     const cells: any[] = [];
     let label = 0;
+    
     for (let i = 0; i < max_cell; i++) {
       const isLabel = i % scale_split_count == 0;
       const capLabel = ceil(label / zoom, 3);
