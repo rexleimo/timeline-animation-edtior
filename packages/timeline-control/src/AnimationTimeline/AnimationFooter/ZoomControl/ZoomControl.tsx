@@ -1,12 +1,19 @@
-import React, { useRef, MouseEvent } from "react";
+import React, { useRef, MouseEvent, useEffect } from "react";
 import './style.less';
 import { clamp, ceil } from 'lodash';
 import { useAtomAnimationConfig } from "../../../jotai";
 import { ConfigMapKey, ConfigMapKeyNumValueNum } from "../../../jotai/AnimationData";
+import { setConfigValue } from "../../../utils/setConfigValue";
 
 export function ZoomControl() {
 
   const [config, setConfig] = useAtomAnimationConfig();
+
+  useEffect(() => {
+    const cur = ref.current as HTMLDivElement;
+    const axis = cur.querySelector('.axis') as HTMLDivElement;
+    axis.style.left = `26px`;
+  }, []);
 
   const ref = useRef<HTMLDivElement>(null);
 
@@ -27,18 +34,14 @@ export function ZoomControl() {
 
       const option = ceil(targetLeft / cur.clientWidth, 1) * 10;
 
-      const zoomControlOption = config.get(ConfigMapKey.ZoomOpiont) as ConfigMapKeyNumValueNum;
-      const targetZoom = zoomControlOption.get(option);
+      const zoomControlOption = config[ConfigMapKey.ZOOM_OPTION] as ConfigMapKeyNumValueNum;
+      const targetZoom = zoomControlOption[option];
 
-      console.log(targetZoom);
-      
-
+      setConfigValue(setConfig, { [ConfigMapKey.ZOOM_VALUE]: targetZoom });
 
     }
 
-
-
-    document.onmouseup = function (e) {
+    document.onmouseup = function () {
       document.onmousemove = null;
     }
 

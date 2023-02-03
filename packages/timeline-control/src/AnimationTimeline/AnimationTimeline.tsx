@@ -1,17 +1,18 @@
 import './style.less';
-import React, { KeyboardEvent, useEffect, useRef, useState, WheelEvent } from 'react';
+import React, { useEffect, useRef, useState, WheelEvent } from 'react';
 import { KeyframesArea } from './KeyframesArea';
 import { KeyframesValue } from './KeyframesValue';
 import { TimeValueMapContext } from './jotai/timeValue';
 import { clamp } from 'lodash';
 import { AnimationMoveLine } from './AnimationMoveLine';
-import { ZoomControl } from './AnimationFooter/ZoomControl/ZoomControl';
 import { AnimationTimeLineFooter } from './AnimationFooter';
+import { useAtomAnimationConfig } from '../jotai';
+import { ConfigMapKey } from '../jotai/AnimationData';
 
 
 export function AnimationTimeline() {
 
-
+  const [config] = useAtomAnimationConfig();
   const [timeMap, setTimeMap] = useState(new Map());
   const [boxWidth, setBoxWidth] = useState(0);
 
@@ -28,7 +29,6 @@ export function AnimationTimeline() {
   const onWheel = (e: WheelEvent<HTMLDivElement>) => {
     const wheel = e;
     const keyCode = 'Control';
-
     if (doKeyCode.current == keyCode) {
       handelWheel(wheel.deltaY, zoom);
     }
@@ -61,11 +61,11 @@ export function AnimationTimeline() {
   return (
     <TimeValueMapContext.Provider value={{ timeMap, setTimeMap, boxWidth, setBoxWidth }}>
       <div tabIndex={0} className='keyframes_area_box' onWheel={onWheel} ref={keyframes_area_ref}>
-        <KeyframesValue zoom={zoom} />
-        <KeyframesArea zoom={zoom} />
+        <KeyframesValue />
+        <KeyframesArea />
         <AnimationMoveLine />
 
-        <AnimationTimeLineFooter/>
+        <AnimationTimeLineFooter />
 
       </div>
     </TimeValueMapContext.Provider>

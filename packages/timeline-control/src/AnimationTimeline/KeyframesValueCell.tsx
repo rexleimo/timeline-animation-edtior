@@ -14,7 +14,7 @@ export function KeyframesValueCell(props: KeyframesValueCellParams) {
       left: left
     }}>
       <span className='tip'>
-        {showLabel && label}
+        {showLabel && `${label}S`}
       </span>
     </div>
   )

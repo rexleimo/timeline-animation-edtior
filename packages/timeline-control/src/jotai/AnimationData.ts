@@ -1,35 +1,62 @@
-import { atom, useAtom } from 'jotai';
+import { atom, useAtom, useAtomValue } from 'jotai';
 import { KeyframesRowControlParams } from '../AnimationTimeline/types/KeyframesRowControlParams';
 
 export enum ConfigMapKey {
-  ZoomOpiont
+  ZOOM_OPTION,
+  ZOOM_VALUE,
+  MAX_TIME,
+  SCROLLING,
 }
 
-export type ConfigMapKeyNumValueNum = Map<number, number>;
+export type ConfigMapKeyNumValueNum = { [x: number]: number };
+export interface IScrollingConfig {
+  length: number;
+  scrollLeft: number;
+  dom: HTMLDivElement
+}
 
-const ZoomOpiontMap = new Map<number, number>();
-ZoomOpiontMap.set(1, 0.1);
-ZoomOpiontMap.set(2, 0.5);
-ZoomOpiontMap.set(3, 1);
-ZoomOpiontMap.set(4, 1.5);
-ZoomOpiontMap.set(5, 2);
-ZoomOpiontMap.set(6, 2.5);
-ZoomOpiontMap.set(7, 2.5);
-ZoomOpiontMap.set(8, 3);
-ZoomOpiontMap.set(9, 3.5);
-ZoomOpiontMap.set(10, 4);
+const ZoomOpiontMap = {
+  0: 0.05,
+  1: 0.1,
+  2: 0.5,
+  3: 1,
+  4: 1.5,
+  5: 2,
+  6: 2.5,
+  7: 3,
+  8: 3.5,
+  9: 4,
+  10: 4.5
+}
 
+// 默认最大时长
+const DefualtMaxTime = 20 * 1000;
 
 export const AnimationData = atom<KeyframesRowControlParams[]>([]);
 
-const animationConfigDataMap = new Map();
-animationConfigDataMap.set(
-  ConfigMapKey.ZoomOpiont, ZoomOpiontMap);
+const ScrollingConfig = {
+  length: 0,
+  scrollLeft: 0
+};
+
+const animationConfigDataMap = {
+  [ConfigMapKey.ZOOM_OPTION]: ZoomOpiontMap,
+  [ConfigMapKey.ZOOM_VALUE]: 1,
+  [ConfigMapKey.MAX_TIME]: DefualtMaxTime,
+  [ConfigMapKey.SCROLLING]: ScrollingConfig
+};
 
 
-
-export const AnimationConfig = atom<Map<number, any>>(animationConfigDataMap);
+export const AnimationConfig = atom<{ [x: number]: any }>(animationConfigDataMap);
 
 export const useAtomAnimationConfig = () => {
   return useAtom(AnimationConfig)
 };
+
+export const useAtomAnimationConfigValue = () => {
+  return useAtomValue(AnimationConfig);
+}
+
+export const useAnimationData = () => {
+  return useAtom(AnimationData);
+}

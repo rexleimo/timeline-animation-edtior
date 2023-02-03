@@ -2,22 +2,28 @@ import React, { useRef, useEffect, useState, useContext, MouseEvent } from 'reac
 import { KeyframesValueCell } from './KeyframesValueCell';
 import './style.less';
 import KeyframesValueParams from './types/KeyframesValueParams';
-import { ceil, clamp } from 'lodash';
+import { ceil, max } from 'lodash';
 import { TimeValueMapContext } from './jotai/timeValue';
 import { useAtom } from 'jotai';
 import CurClientXEvents from './jotai/curClientXEvnet';
 
+import { ConfigMapKey, IScrollingConfig, useAnimationData, useAtomAnimationConfig, useAtomAnimationConfigValue } from '../jotai/AnimationData';
+import { setConfigValue } from '../utils/setConfigValue';
+
 export function KeyframesValue(props: KeyframesValueParams) {
 
-  let { setTimeMap, setBoxWidth } = useContext(TimeValueMapContext);
+  let { setTimeMap } = useContext(TimeValueMapContext);
   const [, setClientX] = useAtom(CurClientXEvents);
-
-  const { zoom = 1 } = props;
+  const [config, setConfig] = useAtomAnimationConfig();
+  const [tableList] = useAnimationData();
 
   const keyframes_area_ref = useRef<HTMLDivElement>(null);
   const [max_cell, setMaxCell] = useState<number>(0);
-  const [scale_width, setScaleWidth] = useState(160);
-  const scale_split_count = 10;
+  const [scale_width] = useState(160);
+
+  const [rows, setRow] = useState<any[]>([]);
+
+  const scale_split_count = 5;
 
   useEffect(() => {
     const cur = keyframes_area_ref.current as HTMLDivElement;
@@ -32,54 +38,80 @@ export function KeyframesValue(props: KeyframesValueParams) {
   }, []);
 
   useEffect(() => {
+    const max_time = config[ConfigMapKey.MAX_TIME];
+    const zoom_value = config[ConfigMapKey.ZOOM_VALUE];
+
+    const all_values = tableList.reduce((result: number[], cur) => {
+      const values = cur.keyframesInfo.map(v => v.value);
+      return result.concat(values);
+    }, []);
+
+    const target_max_time = Math.max(...all_values, max_time);
+    // 目前是 1
+    const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+    // 目前的缩放值
+
+    const cap = zoom_value * 1000 / scale_split_count;
+    const count = target_max_time / cap;
+    const page = (count - 1) / (getcolumnwidth() + 1);
+    const clientWidth = scrolling_config.dom ? scrolling_config.dom.clientWidth : 1;
+    scrolling_config.length = page * clientWidth;
+
+    setConfigValue(setConfig, scrolling_config);
+
+    setMaxCell(Math.floor(count));
+
+  }, [config[ConfigMapKey.ZOOM_VALUE], tableList.length])
+
+
+  const getRenderCellCount = () => {
+    const max_time = config[ConfigMapKey.MAX_TIME];
+    const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+    const max_width = scrolling_config.length;
+    const scroll_left = scrolling_config.scrollLeft;
+    const start_idx = Math.floor(scroll_left / max_width * max_cell);
+
     const cur = keyframes_area_ref.current as HTMLElement;
 
-    const curWidth = cur.clientWidth;
-    const diff = curWidth * zoom;
+    const end_idx = start_idx + Math.floor(cur.clientWidth / getcolumnwidth());
 
-    const zoomWidth = clamp(curWidth + diff, document.body.clientWidth, document.body.clientWidth * 2);
-    cur.style.width = `${Math.ceil(zoomWidth)}px`;
-    setBoxWidth(cur.clientWidth);
+    return {
+      start_idx,
+      end_idx
+    }
 
-    setScaleWidth((pre) => {
-      return Math.min(Math.max(160 / 4, pre * zoom), 160 * 4);
-    });
-  }, [zoom])
+  }
 
   useEffect(() => {
-    const cur = keyframes_area_ref.current as HTMLElement;
-    const cell_width = Math.ceil(cur.clientWidth / getcolumnwidth());
-    setMaxCell(cell_width);
-  }, [scale_width])
-
-  useEffect(() => {
+    const rows: any[] = [];
 
     let map = new Map<number, number>();
-    const items = keyframes_area_ref.current?.querySelectorAll('.keyframes_values_cell') as unknown as HTMLElement[];
-    items?.forEach((_, idx: number) => {
-      map.set(ceil(idx * 100 / zoom, 1), getcolumnwidth() * (idx + 1) + 1);
-    });
+    const cur_zoom = config[ConfigMapKey.ZOOM_VALUE];
+    const { start_idx, end_idx } = getRenderCellCount();
 
+    let i = 0;
+    for (let idx = start_idx; idx < end_idx; idx++) {
+      const showLabel = idx % scale_split_count == 0;
+
+      const time_idx = 1000 * cur_zoom * idx / scale_split_count;
+      const label = ceil(time_idx / 1000, 3);
+      const left = getcolumnwidth() * (i + 1);
+      map.set(time_idx, left + 1);
+      const row = {
+        showLabel,
+        label,
+        left
+      }
+      rows.push(row);
+      i++;
+    }
+    setRow(rows);
     setTimeMap(map);
 
-  }, [zoom, max_cell])
+  }, [config[ConfigMapKey.ZOOM_VALUE], (config[ConfigMapKey.SCROLLING] as IScrollingConfig).scrollLeft]);
 
   const getcolumnwidth = () => {
     return scale_width / scale_split_count;
-  }
-
-  const gridColumnRender = () => {
-    const cells: any[] = [];
-    let label = 0;
-    
-    for (let i = 0; i < max_cell; i++) {
-      const isLabel = i % scale_split_count == 0;
-      const capLabel = ceil(label / zoom, 3);
-      const item = <KeyframesValueCell key={i} showLabel={isLabel} label={`${capLabel}S`} left={getcolumnwidth() * (i + 1)} />
-      cells.push(item);
-      if (isLabel) label++;
-    }
-    return cells;
   }
 
   const onClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -94,9 +126,16 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
     <div className='keyframes_values' ref={keyframes_area_ref} onClick={onClick}>
 
-      {gridColumnRender()}
+      {
+        rows.map((v, idx) => (
+          <KeyframesValueCell {...v} key={idx} />
+        ))
+      }
 
     </div>
   );
 }
+
+
+
 

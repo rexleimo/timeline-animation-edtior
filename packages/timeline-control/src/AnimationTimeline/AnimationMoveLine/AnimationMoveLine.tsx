@@ -29,9 +29,7 @@ export function AnimationMoveLine() {
       const targetLeft = startLeft + diff;
       let timeKey;
       // 向上取整 给 row
-
       for (const [key, val] of timeMap.entries()) {
-
         if (targetLeft <= val) {
           timeKey = key;
           cur.style.left = `${val - 2}px`;
