@@ -24,7 +24,7 @@ export function ZoomControl() {
     const startX = axis.clientLeft;
     const startWidth = cur.offsetLeft;
     const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-    const startScaleWidth = scrolling_config.scaleWidth;
+    const startScaleWidth = scrolling_config.scaleDefaultWidth;
 
     document.onmousemove = function (m) {
       const endX = m.clientX;
@@ -42,7 +42,7 @@ export function ZoomControl() {
       const option = zoomControlOptionHandle(percentage);
       const targetZoom = zoomControlOption[option];
 
-      scrolling_config.scaleWidth = startScaleWidth + percentage;
+      scrolling_config.scaleWidth = startScaleWidth + percentage * 2;
       setConfigValue(setConfig, {
         [ConfigMapKey.ZOOM_VALUE]: targetZoom,
         [ConfigMapKey.SCROLLING]: scrolling_config

@@ -16,6 +16,7 @@ export interface IScrollingConfig {
   dom: HTMLDivElement;
   clientWidth: number;
   scaleWidth: number;
+  scaleDefaultWidth: number;
   page: {
     limit: number,
     current: number,
@@ -35,12 +36,12 @@ const ZoomOpiontMap = {
 const DefualtMaxTime = 20 * 1000;
 
 export const AnimationData = atom<KeyframesRowControlParams[]>([]);
-
+const scaleDefaultWidth = 100;
 const ScrollingConfig = {
   length: 0,
   scrollLeft: 0,
-  clientWidth: 0,
-  scaleWidth: 100,
+  scaleWidth: scaleDefaultWidth,
+  scaleDefaultWidth,
 };
 
 const animationConfigDataMap = {
