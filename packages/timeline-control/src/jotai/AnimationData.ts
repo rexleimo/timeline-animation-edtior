@@ -6,6 +6,7 @@ export enum ConfigMapKey {
   ZOOM_VALUE,
   MAX_TIME,
   SCROLLING,
+  TIME_LINE
 }
 
 export type ConfigMapKeyNumValueNum = { [x: number]: number };
@@ -44,11 +45,20 @@ const ScrollingConfig = {
   scaleDefaultWidth,
 };
 
+export interface ITimeLineConfig {
+  clientWidth: number;
+}
+
+const timeLineConfig = {
+  clientWidth: 0
+}
+
 const animationConfigDataMap = {
   [ConfigMapKey.ZOOM_OPTION]: ZoomOpiontMap,
   [ConfigMapKey.ZOOM_VALUE]: 1,
   [ConfigMapKey.MAX_TIME]: DefualtMaxTime,
-  [ConfigMapKey.SCROLLING]: ScrollingConfig
+  [ConfigMapKey.SCROLLING]: ScrollingConfig,
+  [ConfigMapKey.TIME_LINE]: timeLineConfig
 };
 
 

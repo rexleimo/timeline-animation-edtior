@@ -3,9 +3,17 @@ import './style.less';
 import { TimeValueMapContext } from '../jotai/timeValue'
 import { useAtomValue } from "jotai";
 import CurClientXEvents from "../jotai/curClientXEvnet";
+import { useAtomAnimationConfig } from "../../jotai";
+import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from "../../jotai/AnimationData";
+import { setConfigValue } from "../../utils/setConfigValue";
+import { clamp } from 'lodash';
 
 export function AnimationMoveLine() {
   const clientX = useAtomValue(CurClientXEvents);
+  const [config, setConfig] = useAtomAnimationConfig();
+
+  const maxTime = config[ConfigMapKey.MAX_TIME];
+  const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
 
   const { timeMap } = useContext(TimeValueMapContext);
   const lineRef = useRef<HTMLDivElement>(null);
@@ -27,19 +35,20 @@ export function AnimationMoveLine() {
       const endX = m.clientX;
       const diff = endX - startX;
       const targetLeft = startLeft + diff;
-      let timeKey;
+      let timeKey = 0;
+      let calculationLeft = 0;
       // 向上取整 给 row
       for (const [key, val] of timeMap.entries()) {
         if (targetLeft <= val) {
           timeKey = key;
+          calculationLeft = val;
           cur.style.left = `${val - 2}px`;
           break;
         }
-
       }
-
-      console.log(timeKey);
-
+      const timeLineConfig = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
+      const moveLeftPercentage = calculationLeft / timeLineConfig.clientWidth;
+      moveLineHandle(moveLeftPercentage);
     }
 
     document.onmouseup = () => {
@@ -47,6 +56,21 @@ export function AnimationMoveLine() {
     }
 
   }
+
+  const moveLineHandle = (moveLeftPercentage: number) => {
+    let scrollLeft = scrollingConfig.scrollLeft;
+    if (moveLeftPercentage > 0.9) {
+      scrollLeft += 4;
+    } else if (moveLeftPercentage < 0.1) {
+      scrollLeft -= 4;
+    } else {
+    }
+    scrollingConfig.scrollLeft = clamp(scrollLeft, 0, scrollingConfig.clientWidth - scrollingConfig.scrollWidth);
+    setConfigValue(setConfig, {
+      [ConfigMapKey.SCROLLING]: scrollingConfig
+    });
+  }
+
 
   useEffect(() => {
     const cur = lineRef.current as HTMLElement;

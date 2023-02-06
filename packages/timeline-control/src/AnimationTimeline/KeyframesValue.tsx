@@ -71,7 +71,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
     setMaxCell(Math.floor(count));
 
-  }, [config[ConfigMapKey.ZOOM_VALUE], tableList.length])
+  }, [config[ConfigMapKey.ZOOM_VALUE], tableList.length, config[ConfigMapKey.MAX_TIME]]);
 
 
   const getRenderCellCount = () => {

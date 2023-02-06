@@ -15,6 +15,7 @@ export function Scrolling() {
 
   const ref = useRef<HTMLDivElement>(null);
 
+
   useEffect(() => {
     const cur = ref.current as HTMLDivElement;
     const { length, clientWidth, page } = scrolling_config;
@@ -63,14 +64,15 @@ export function Scrolling() {
       scrolling_config.dom = ref.current;
       setConfigValue(setConfig, scrolling_config);
     }
-  }, [ref])
+  }, [ref]);
 
   return (
     <div className="scrolling_box" ref={ref}>
       <div
         style={{
           width: max_len,
-          display: show ? 'block' : 'none'
+          display: show ? 'block' : 'none',
+          left: scrolling_config.scrollLeft
         }}
         className="scrolling_control" onMouseDown={onScroll}></div>
     </div>

@@ -7,12 +7,13 @@ import { clamp } from 'lodash';
 import { AnimationMoveLine } from './AnimationMoveLine';
 import { AnimationTimeLineFooter } from './AnimationFooter';
 import { useAtomAnimationConfig } from '../jotai';
-import { ConfigMapKey } from '../jotai/AnimationData';
+import { ConfigMapKey, ITimeLineConfig } from '../jotai/AnimationData';
+import { setConfigValue } from '../utils/setConfigValue';
 
 
 export function AnimationTimeline() {
 
-  const [config] = useAtomAnimationConfig();
+  const [config, setConfig] = useAtomAnimationConfig();
   const [timeMap, setTimeMap] = useState(new Map());
   const [boxWidth, setBoxWidth] = useState(0);
 
@@ -56,6 +57,15 @@ export function AnimationTimeline() {
   }, [])
 
 
+  useEffect(() => {
+    if (keyframes_area_ref.current) {
+      const timeLineConfig = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
+      timeLineConfig.clientWidth = keyframes_area_ref.current.offsetWidth;
+      setConfigValue(setConfig, {
+        [ConfigMapKey.TIME_LINE]: timeLineConfig
+      })
+    }
+  }, [keyframes_area_ref])
 
 
   return (
