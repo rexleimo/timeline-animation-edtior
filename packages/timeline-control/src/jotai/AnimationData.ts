@@ -12,7 +12,15 @@ export type ConfigMapKeyNumValueNum = { [x: number]: number };
 export interface IScrollingConfig {
   length: number;
   scrollLeft: number;
-  dom: HTMLDivElement
+  scrollWidth: number;
+  dom: HTMLDivElement;
+
+  clientWidth: number;
+  page: {
+    limit: number,
+    current: number,
+    total: number,
+  }
 }
 
 const ZoomOpiontMap = {
@@ -36,7 +44,8 @@ export const AnimationData = atom<KeyframesRowControlParams[]>([]);
 
 const ScrollingConfig = {
   length: 0,
-  scrollLeft: 0
+  scrollLeft: 0,
+  clientWidth: 0
 };
 
 const animationConfigDataMap = {

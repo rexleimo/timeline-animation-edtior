@@ -1,25 +1,60 @@
-import React, { useEffect, useState, UIEvent, useRef } from "react";
+import React, { useEffect, useState, MouseEvent, useRef } from "react";
 import { useAtomAnimationConfig } from "../../../jotai";
 import { ConfigMapKey, IScrollingConfig } from "../../../jotai/AnimationData";
 import { setConfigValue } from "../../../utils/setConfigValue";
 import './style.less';
+import { clamp, constant } from 'lodash';
 
 export function Scrolling() {
   const [config, setConfig] = useAtomAnimationConfig();
 
-  const [width, setWidth] = useState(0);
+  const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+
+  const [max_len, setMaxLen] = useState(0);
+  const [show, setShow] = useState(false);
+
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setWidth(config[ConfigMapKey.SCROLLING].length);
-  }, [config])
+    const cur = ref.current as HTMLDivElement;
+    const { length, clientWidth, page } = scrolling_config;
 
-  const onScroll = (e: UIEvent<HTMLDivElement>) => {
+    if (clientWidth > length) {
+      setShow(false);
+    } else {
+      setShow(true);
+      const scroll_width = clientWidth / page.total;
+      setMaxLen(scroll_width);
+
+      setTimeout(() => {
+        const control = cur.querySelector('.scrolling_control') as HTMLDivElement;
+        scrolling_config.scrollWidth = control.offsetWidth;
+        setConfigValue(setConfig, scrolling_config);
+      }, 0);
+    }
+
+  }, [scrolling_config.length]);
+
+  const onScroll = (e: MouseEvent<HTMLDivElement>) => {
+    const controlWidth = ref.current as HTMLDivElement;
+
     const target = e.target as HTMLDivElement;
-    const left = target.scrollLeft;
-    const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-    scrolling_config.scrollLeft = left;
-    setConfigValue(setConfig, scrolling_config);
+    const startX = e.clientX;
+    const startLeft = target.offsetLeft;
+
+    document.onmousemove = function (e) {
+      const clientX = e.clientX;
+      const left = clamp(startLeft + clientX - startX, 0, controlWidth.offsetWidth - target.offsetWidth);
+      const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+      scrolling_config.scrollLeft = left;
+      setConfigValue(setConfig, scrolling_config);
+      target.style.left = `${left}px`;
+    }
+
+    document.onmouseup = function () {
+      document.onmousemove = null;
+    }
+
   }
 
   useEffect(() => {
@@ -31,8 +66,13 @@ export function Scrolling() {
   }, [ref])
 
   return (
-    <div className="scrolling_box" ref={ref} onScroll={onScroll}>
-      <div style={{ width }} ></div>
+    <div className="scrolling_box" ref={ref}>
+      <div
+        style={{
+          width: max_len,
+          display: show ? 'block' : 'none'
+        }}
+        className="scrolling_control" onMouseDown={onScroll}></div>
     </div>
   );
 }

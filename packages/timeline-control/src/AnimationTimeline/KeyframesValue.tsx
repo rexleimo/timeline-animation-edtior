@@ -56,6 +56,13 @@ export function KeyframesValue(props: KeyframesValueParams) {
     const page = (count - 1) / (getcolumnwidth() + 1);
     const clientWidth = scrolling_config.dom ? scrolling_config.dom.clientWidth : 1;
     scrolling_config.length = page * clientWidth;
+    scrolling_config.clientWidth = clientWidth;
+
+    scrolling_config.page = {
+      limit: getcolumnwidth(),
+      current: 1,
+      total: page
+    };
 
     setConfigValue(setConfig, scrolling_config);
 
@@ -65,14 +72,16 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
 
   const getRenderCellCount = () => {
-    const max_time = config[ConfigMapKey.MAX_TIME];
     const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-    const max_width = scrolling_config.length;
+    const max_width = scrolling_config.clientWidth;
     const scroll_left = scrolling_config.scrollLeft;
-    const start_idx = Math.floor(scroll_left / max_width * max_cell);
+    const scrollWidth = ceil(scrolling_config.scrollWidth);
 
+    const target_width = ceil(max_width - (scrollWidth || 0), 2);
+    let coefficient = scroll_left / target_width;
+
+    const start_idx = Math.floor(coefficient * max_cell);
     const cur = keyframes_area_ref.current as HTMLElement;
-
     const end_idx = start_idx + Math.floor(cur.clientWidth / getcolumnwidth());
 
     return {
@@ -88,6 +97,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
     let map = new Map<number, number>();
     const cur_zoom = config[ConfigMapKey.ZOOM_VALUE];
     const { start_idx, end_idx } = getRenderCellCount();
+    console.log(start_idx);
 
     let i = 0;
     for (let idx = start_idx; idx < end_idx; idx++) {
