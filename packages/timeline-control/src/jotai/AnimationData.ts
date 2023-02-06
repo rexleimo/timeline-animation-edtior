@@ -14,8 +14,8 @@ export interface IScrollingConfig {
   scrollLeft: number;
   scrollWidth: number;
   dom: HTMLDivElement;
-
   clientWidth: number;
+  scaleWidth: number;
   page: {
     limit: number,
     current: number,
@@ -39,7 +39,8 @@ export const AnimationData = atom<KeyframesRowControlParams[]>([]);
 const ScrollingConfig = {
   length: 0,
   scrollLeft: 0,
-  clientWidth: 0
+  clientWidth: 0,
+  scaleWidth: 100,
 };
 
 const animationConfigDataMap = {

@@ -19,7 +19,10 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
   const keyframes_area_ref = useRef<HTMLDivElement>(null);
   const [max_cell, setMaxCell] = useState<number>(0);
-  const [scale_width] = useState(160);
+
+  const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+
+  const scale_width = scrolling_config.scaleWidth;
 
   const [rows, setRow] = useState<any[]>([]);
 

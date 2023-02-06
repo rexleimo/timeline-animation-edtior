@@ -2,7 +2,7 @@ import React, { useRef, MouseEvent, useEffect } from "react";
 import './style.less';
 import { clamp, ceil } from 'lodash';
 import { useAtomAnimationConfig } from "../../../jotai";
-import { ConfigMapKey, ConfigMapKeyNumValueNum } from "../../../jotai/AnimationData";
+import { ConfigMapKey, ConfigMapKeyNumValueNum, IScrollingConfig } from "../../../jotai/AnimationData";
 import { setConfigValue } from "../../../utils/setConfigValue";
 
 
@@ -13,7 +13,7 @@ export function ZoomControl() {
   useEffect(() => {
     const cur = ref.current as HTMLDivElement;
     const axis = cur.querySelector('.axis') as HTMLDivElement;
-    axis.style.left = `26px`;
+    axis.style.left = '75%';
   }, []);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -23,6 +23,8 @@ export function ZoomControl() {
     const axis = cur.querySelector('.axis') as HTMLDivElement;
     const startX = axis.clientLeft;
     const startWidth = cur.offsetLeft;
+    const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+    const startScaleWidth = scrolling_config.scaleWidth;
 
     document.onmousemove = function (m) {
       const endX = m.clientX;
@@ -35,13 +37,16 @@ export function ZoomControl() {
       axis.style.left = `${left}px`;
 
       const zoomControlOption = config[ConfigMapKey.ZOOM_OPTION] as ConfigMapKeyNumValueNum;
-      const percentage = Math.ceil(left / offsetWidth * 100);
+      const percentage = Math.ceil(left / offsetWidth * 100)
 
       const option = zoomControlOptionHandle(percentage);
-
       const targetZoom = zoomControlOption[option];
 
-      setConfigValue(setConfig, { [ConfigMapKey.ZOOM_VALUE]: targetZoom });
+      scrolling_config.scaleWidth = startScaleWidth + percentage;
+      setConfigValue(setConfig, {
+        [ConfigMapKey.ZOOM_VALUE]: targetZoom,
+        [ConfigMapKey.SCROLLING]: scrolling_config
+      });
     }
 
     const zoomControlOptionHandle = (percentage: number): number => {
