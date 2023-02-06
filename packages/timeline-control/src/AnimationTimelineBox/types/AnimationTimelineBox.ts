@@ -1,4 +1,4 @@
-import { KeyframesRowControlParams } from "../../AnimationTimeline/types/KeyframesRowControlParams";
+import { KeyframesRowControlParams } from "../../AnimationTimelineArea/types/KeyframesRowControlParams";
 
 export interface AnimationTimelineBoxParams {
   rows: KeyframesRowControlParams[]

@@ -3,7 +3,7 @@ import { useAtomAnimationConfig } from "../../../jotai";
 import { ConfigMapKey, IScrollingConfig } from "../../../jotai/AnimationData";
 import { setConfigValue } from "../../../utils/setConfigValue";
 import './style.less';
-import { clamp, constant } from 'lodash';
+import { clamp, throttle } from 'lodash';
 
 export function Scrolling() {
   const [config, setConfig] = useAtomAnimationConfig();
@@ -36,6 +36,12 @@ export function Scrolling() {
 
   }, [scrolling_config.length]);
 
+  const emitScrollingLeft = throttle((left) => {
+    const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+    scrolling_config.scrollLeft = left;
+    setConfigValue(setConfig, scrolling_config);
+  }, 0);
+
   const onScroll = (e: MouseEvent<HTMLDivElement>) => {
     const controlWidth = ref.current as HTMLDivElement;
 
@@ -46,10 +52,8 @@ export function Scrolling() {
     document.onmousemove = function (e) {
       const clientX = e.clientX;
       const left = clamp(startLeft + clientX - startX, 0, controlWidth.offsetWidth - target.offsetWidth);
-      const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-      scrolling_config.scrollLeft = left;
-      setConfigValue(setConfig, scrolling_config);
       target.style.left = `${left}px`;
+      emitScrollingLeft(left);
     }
 
     document.onmouseup = function () {

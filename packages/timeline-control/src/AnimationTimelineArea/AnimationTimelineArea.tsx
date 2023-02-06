@@ -4,14 +4,12 @@ import { KeyframesArea } from './KeyframesArea';
 import { KeyframesValue } from './KeyframesValue';
 import { TimeValueMapContext } from './jotai/timeValue';
 import { clamp } from 'lodash';
-import { AnimationMoveLine } from './AnimationMoveLine';
-import { AnimationTimeLineFooter } from './AnimationFooter';
 import { useAtomAnimationConfig } from '../jotai';
 import { ConfigMapKey, ITimeLineConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
 
 
-export function AnimationTimeline() {
+export function AnimationTimelineArea() {
 
   const [config, setConfig] = useAtomAnimationConfig();
   const [timeMap, setTimeMap] = useState(new Map());
@@ -73,10 +71,6 @@ export function AnimationTimeline() {
       <div tabIndex={0} className='keyframes_area_box' onWheel={onWheel} ref={keyframes_area_ref}>
         <KeyframesValue />
         <KeyframesArea />
-        <AnimationMoveLine />
-
-        <AnimationTimeLineFooter />
-
       </div>
     </TimeValueMapContext.Provider>
 

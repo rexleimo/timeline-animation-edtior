@@ -1,9 +1,10 @@
 import React, { useEffect } from 'react';
-import { AnimationTimeline } from '../AnimationTimeline';
+import { AnimationTimelineArea } from '../AnimationTimelineArea';
 import { AnimationTimelineBoxParams } from './types/AnimationTimelineBox';
 import { useAtom } from 'jotai';
 import { AnimationData } from '../jotai/AnimationData';
 import { AnimationTimelineHeader } from '../AnimationTimelineHeader';
+import { AnimationTimeLineFooter } from '../AnimationTimelineArea/AnimationFooter';
 
 export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
 
@@ -16,9 +17,10 @@ export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
   }, [rows])
 
   return (
-    <> 
+    <>
       <AnimationTimelineHeader />
-      <AnimationTimeline />
+      <AnimationTimelineArea />
+      <AnimationTimeLineFooter />
     </>
   );
 }

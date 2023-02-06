@@ -1,5 +1,5 @@
 import { atom, useAtom, useAtomValue } from 'jotai';
-import { KeyframesRowControlParams } from '../AnimationTimeline/types/KeyframesRowControlParams';
+import { KeyframesRowControlParams } from '../AnimationTimelineArea/types/KeyframesRowControlParams';
 
 export enum ConfigMapKey {
   ZOOM_OPTION,

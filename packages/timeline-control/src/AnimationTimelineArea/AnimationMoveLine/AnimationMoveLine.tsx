@@ -46,9 +46,6 @@ export function AnimationMoveLine() {
           break;
         }
       }
-      const timeLineConfig = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
-      const moveLeftPercentage = calculationLeft / timeLineConfig.clientWidth;
-      moveLineHandle(moveLeftPercentage);
     }
 
     document.onmouseup = () => {

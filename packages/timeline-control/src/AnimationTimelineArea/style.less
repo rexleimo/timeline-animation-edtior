@@ -1,6 +1,5 @@
 .keyframes_area_box{
   min-height: 300px;
-  padding-top: 20px;
   overflow: hidden;
   outline: none;
   position: relative;
@@ -67,15 +66,22 @@
 
 .keyframes_values{
   position: relative;
-  height: 20px;
-  margin-top: 20px;
+  height: 40px;
+  overflow: scroll;
+  width: 100%;
+  padding-top: 20px;
+
+  &::-webkit-scrollbar{
+    // display: none !important;
+  }
+  
   &_cell{
     position: absolute;
     border-right: 1px solid #999;
     align-self: end;
     .tip{
       position: absolute;
-      top: -40px;
+      top: -20px;
       left: 100%;
       transform: translateX(-50%);
       font-size: 14px;
