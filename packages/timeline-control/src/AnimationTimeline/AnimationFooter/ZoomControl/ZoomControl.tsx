@@ -29,16 +29,28 @@ export function ZoomControl() {
       const diff = endX - startX;
 
       const maxStartX = cur.offsetWidth;
-      const targetLeft = clamp(diff - startWidth, 0, maxStartX - axis.clientWidth);
+      const offsetWidth = maxStartX - axis.offsetWidth;
+      const left = clamp(diff - startWidth, 0, offsetWidth);
 
-      axis.style.left = `${targetLeft}px`;
-
-      const option = ceil(targetLeft / cur.clientWidth, 1) * 10;
+      axis.style.left = `${left}px`;
 
       const zoomControlOption = config[ConfigMapKey.ZOOM_OPTION] as ConfigMapKeyNumValueNum;
+      const percentage = Math.ceil(left / offsetWidth * 100);
+
+      const option = zoomControlOptionHandle(percentage);
+
       const targetZoom = zoomControlOption[option];
 
       setConfigValue(setConfig, { [ConfigMapKey.ZOOM_VALUE]: targetZoom });
+    }
+
+    const zoomControlOptionHandle = (percentage: number): number => {
+      if (0 <= percentage && percentage < 25) return 0;
+      if (25 <= percentage && percentage < 50) return 25;
+      if (50 <= percentage && percentage < 75) return 50;
+      if (75 <= percentage && percentage < 100) return 75;
+      if (percentage === 100) return 100;
+      return 0;
     }
 
     document.onmouseup = function () {

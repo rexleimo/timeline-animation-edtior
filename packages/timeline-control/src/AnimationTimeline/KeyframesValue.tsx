@@ -2,12 +2,12 @@ import React, { useRef, useEffect, useState, useContext, MouseEvent } from 'reac
 import { KeyframesValueCell } from './KeyframesValueCell';
 import './style.less';
 import KeyframesValueParams from './types/KeyframesValueParams';
-import { ceil, max } from 'lodash';
+import { ceil } from 'lodash';
 import { TimeValueMapContext } from './jotai/timeValue';
 import { useAtom } from 'jotai';
 import CurClientXEvents from './jotai/curClientXEvnet';
 
-import { ConfigMapKey, IScrollingConfig, useAnimationData, useAtomAnimationConfig, useAtomAnimationConfigValue } from '../jotai/AnimationData';
+import { ConfigMapKey, IScrollingConfig, useAnimationData, useAtomAnimationConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
 
 export function KeyframesValue(props: KeyframesValueParams) {
@@ -23,7 +23,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
 
   const [rows, setRow] = useState<any[]>([]);
 
-  const scale_split_count = 5;
+  const scale_split_count = 10;
 
   useEffect(() => {
     const cur = keyframes_area_ref.current as HTMLDivElement;
