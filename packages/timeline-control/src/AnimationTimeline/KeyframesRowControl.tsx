@@ -3,17 +3,25 @@ import './style.less';
 import { KeyframesRowControlParams } from './types/KeyframesRowControlParams';
 import { maxBy, minBy, throttle } from 'lodash';
 import { KeyframesData } from './types/KeyframesData';
-import { useAnimationTimeMap } from '../jotai/AnimationTimeMap';
+import { useAnimationTimeMap, useAnimationTimeScrollLeft } from '../jotai/AnimationTimeMap';
+import { useAtomAnimationConfig } from '../jotai';
+import { ConfigMapKey, IScrollingConfig } from '../jotai/AnimationData';
 
 export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const { zoom, keyframesInfo } = props;
 
+  const [config] = useAtomAnimationConfig();
   const [timeMap] = useAnimationTimeMap();
+  const [timeLineScrollLeft] = useAnimationTimeScrollLeft();
+
 
   const curRef = useRef<HTMLDivElement>(null);
   const controlRef = useRef<HTMLDivElement>(null);
+  const timeLineScrollLeftRef = useRef(0);
 
   const timeMapRef = useRef<Map<number, number>>(new Map());
+
+  const scrollConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
 
   const onMouseDown = (e: MouseEvent<HTMLElement>) => {
 
@@ -28,7 +36,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     document.onmousemove = (e) => {
       const clientX = e.clientX;
       const diff = clientX - startX;
-      control.style.width = `${startWidth + diff - control.offsetLeft}px`;
+      control.style.width = `${timeLineScrollLeftRef.current + startWidth + diff - control.offsetLeft}px`;
     }
 
     document.onmouseup = (e) => {
@@ -115,11 +123,23 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
 
   }, [zoom, timeMap])
 
+  useEffect(() => {
+    timeMapRef.current = timeMap;
+  }, [timeMap])
+
+  useEffect(() => {
+    timeLineScrollLeftRef.current = timeLineScrollLeft;
+  }, [timeLineScrollLeft]);
+
+  useEffect(() => {
+    const cur = curRef.current as HTMLDivElement;
+    cur.style.width = `${scrollConfig.length}px`;
+  }, [scrollConfig.length])
+
+
   return (
 
-
     <div className="row" ref={curRef}>
-
       <div
         className="keyframes_area_control"
         ref={controlRef}
