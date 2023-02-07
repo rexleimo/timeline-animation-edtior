@@ -3,18 +3,16 @@ import { useAtomAnimationConfig } from "../../jotai";
 import { ConfigMapKey, IScrollingConfig, ITimeLineConfig, useAnimationData } from "../../jotai/AnimationData";
 
 export function useGetRenderCellCount() {
+  const renderCellScroll = useRenderCellScroll();
+  return renderCellScroll;
+}
+
+function useRenderCellScroll() {
   const [config] = useAtomAnimationConfig();
   const getColumnwidth = useGetcolumnwidth();
-
-  return (scrollLeft: number, max_cell: number) => {
-    const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-    const maxWidth = scrollingConfig.clientWidth;
-    const scrollWidth = ceil(scrollingConfig.scrollWidth);
-
-    const target_width = ceil(maxWidth - (scrollWidth || 0), 2);
-    let coefficient = scrollLeft / target_width;
-
-    const startIdx = Math.floor(coefficient * max_cell);
+  return (scrollLeft: number, maxCell: number, fn: (scrollLeft: number) => number) => {
+    let coefficient = fn(scrollLeft);
+    const startIdx = Math.floor(coefficient * maxCell);
     const cur = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
     const endIdx = startIdx + Math.floor(cur.clientWidth / getColumnwidth());
 
@@ -22,6 +20,16 @@ export function useGetRenderCellCount() {
       startIdx,
       endIdx
     }
+  }
+}
+
+export function useScrollCompoentLeft() {
+  const [config] = useAtomAnimationConfig();
+  return (scrollLeft: number) => {
+    const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+    const maxWidth = scrollingConfig.clientWidth;
+    const scrollWidth = ceil(scrollingConfig.scrollWidth);
+    return scrollLeft / ceil(maxWidth - (scrollWidth || 0), 2);
   }
 }
 

@@ -13,6 +13,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const curRef = useRef<HTMLDivElement>(null);
   const controlRef = useRef<HTMLDivElement>(null);
 
+  const timeMapRef = useRef<Map<number, number>>(new Map());
+
   const onMouseDown = (e: MouseEvent<HTMLElement>) => {
 
     const cur = e.target as HTMLDivElement;

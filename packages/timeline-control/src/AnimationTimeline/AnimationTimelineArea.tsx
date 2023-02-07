@@ -6,7 +6,7 @@ import { clamp, throttle } from 'lodash';
 import { useAtomAnimationConfig } from '../jotai';
 import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
-import { useGetcolumnwidth, useGetMaxCell, useGetRenderCellCount } from './utils/useGetRenderCellCount';
+import { useGetcolumnwidth, useGetMaxCell, useGetRenderCellCount, useScrollCompoentLeft } from './utils/useGetRenderCellCount';
 import { DomUtils } from '../utils/dom';
 import { useAnimationTimeScrollLeft } from '../jotai/AnimationTimeMap';
 
@@ -15,7 +15,8 @@ const throttleScrollLeft = throttle(DomUtils.setDomScrollLeft, 1000 / 24);
 export function AnimationTimelineArea() {
 
   const [config, setConfig] = useAtomAnimationConfig();
-  const [timeLineScrollLeft, setTimeLineScrollerLeft] = useAnimationTimeScrollLeft();
+  const [, setTimeLineScrollerLeft] = useAnimationTimeScrollLeft();
+  const scrolleLeftHandle = useScrollCompoentLeft();
 
   const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
 
@@ -63,7 +64,7 @@ export function AnimationTimelineArea() {
   }, [])
 
   useEffect(() => {
-    const { startIdx } = getRenderCellCount(scrollingConfig.scrollLeft, getMaxCell());
+    const { startIdx } = getRenderCellCount(scrollingConfig.scrollLeft, getMaxCell(), scrolleLeftHandle);
     const cur = keyframes_area_ref.current as HTMLDivElement;
     const scrollLeft = getColumnwidth() * (startIdx);
     throttleScrollLeft(cur, scrollLeft);
@@ -82,6 +83,7 @@ export function AnimationTimelineArea() {
   const onScroll = (ev: UIEvent<HTMLDivElement>) => {
     const target = ev.target as HTMLDivElement;
     const scrollLeft = target.scrollLeft;
+    console.log("ScrolleLeft...", scrollLeft);
     setTimeLineScrollerLeft(scrollLeft);
   }
 

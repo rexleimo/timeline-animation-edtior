@@ -8,8 +8,8 @@ import CurClientXEvents from './jotai/curClientXEvnet';
 
 import { ConfigMapKey, IScrollingConfig, ITimeLineConfig, useAnimationData, useAtomAnimationConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
-import { useGetcolumnwidth, useGetMaxCell, useGetRenderCellCount } from './utils/useGetRenderCellCount';
-import { useAnimationTimeMap } from '../jotai/AnimationTimeMap';
+import { useGetcolumnwidth, useGetMaxCell, useGetRenderCellCount, useScrollCompoentLeft } from './utils/useGetRenderCellCount';
+import { useAnimationTimeMap, useAnimationTimeScrollLeft } from '../jotai/AnimationTimeMap';
 
 export function KeyframesValue(props: KeyframesValueParams) {
 
@@ -25,10 +25,12 @@ export function KeyframesValue(props: KeyframesValueParams) {
   const getMaxCell = useGetMaxCell();
   const getColumnwidth = useGetcolumnwidth();
   const [, setTimeMap] = useAnimationTimeMap();
+  const [timeLineScrollLeft] = useAnimationTimeScrollLeft();
+  const scrolleLeftHandle = useScrollCompoentLeft();
 
   const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
 
-  const scale_split_count = scrollingConfig.scaleCount;
+  const scaleSplitCount = scrollingConfig.scaleCount;
 
   const [rows, setRow] = useState<any[]>([]);
 
@@ -71,10 +73,10 @@ export function KeyframesValue(props: KeyframesValueParams) {
     let map = new Map<number, number>();
     const curZoom = config[ConfigMapKey.ZOOM_VALUE];
 
-    const { startIdx, endIdx } = getRenderCellCount(screenLeft, max_cell);
+    const { startIdx, endIdx } = getRenderCellCount(screenLeft, max_cell, scrolleLeftHandle);
     for (let idx = startIdx; idx < endIdx; idx++) {
-      const showLabel = idx % scale_split_count == 0;
-      const time_idx = 1000 * curZoom * idx / scale_split_count;
+      const showLabel = idx % scaleSplitCount == 0;
+      const time_idx = 1000 * curZoom * idx / scaleSplitCount;
       const label = ceil(time_idx / 1000, 3);
       const left = getColumnwidth() * (idx + 1);
       map.set(time_idx, left + 1);
@@ -97,10 +99,17 @@ export function KeyframesValue(props: KeyframesValueParams) {
     const rows: any[] = [];
     let map = new Map<number, number>();
     const curZoom = config[ConfigMapKey.ZOOM_VALUE];
-    const { startIdx, endIdx } = getRenderCellCount(screenLeft, max_cell);
+    const scale = getColumnwidth();
+    const cur = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
+
+    const scaleTime = 1000 * curZoom / scaleSplitCount;
+    const startIdx = Math.ceil(timeLineScrollLeft / scale);
+    console.log(startIdx);
+    const endIdx = startIdx + Math.floor(cur.clientWidth / getColumnwidth());
+
     for (let idx = startIdx; idx < endIdx; idx++) {
-      const showLabel = idx % scale_split_count == 0;
-      const time_idx = 1000 * curZoom * idx / scale_split_count;
+      const showLabel = idx % scaleSplitCount == 0;
+      const time_idx = 1000 * curZoom * idx / scaleSplitCount;
       const label = ceil(time_idx / 1000, 3);
       const left = getColumnwidth() * (idx + 1);
       map.set(time_idx, left + 1);
@@ -113,7 +122,7 @@ export function KeyframesValue(props: KeyframesValueParams) {
     }
     setRow(rows);
     setTimeMap(map);
-  }, [scrollingConfig.scrollLeft])
+  }, [timeLineScrollLeft])
 
   const getPageSize = () => {
     const cur = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig
