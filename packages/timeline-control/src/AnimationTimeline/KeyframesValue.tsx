@@ -7,11 +7,11 @@ import { TimeValueMapContext } from './jotai/timeValue';
 import { useAtom } from 'jotai';
 import CurClientXEvents from './jotai/curClientXEvnet';
 
-import { ConfigMapKey, IScrollingConfig, useAnimationData, useAtomAnimationConfig } from '../jotai/AnimationData';
+import { ConfigMapKey, IScrollingConfig, ITimeLineConfig, useAnimationData, useAtomAnimationConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
 import { DomUtils } from '../utils/dom';
+import { useGetMaxCell, useGetRenderCellCount } from './utils/useGetRenderCellCount';
 
-const throttleScrollLeft = throttle(DomUtils.setDomScrollLeft, 1000 / 24);
 const throttleScrollEvent = throttle((fn) => { fn() }, 500);
 
 
@@ -26,14 +26,16 @@ export function KeyframesValue(props: KeyframesValueParams) {
   const scroll_ref = useRef<HTMLDivElement>(null);
 
   const [max_cell, setMaxCell] = useState<number>(0);
+  const getRenderCellCount = useGetRenderCellCount();
+  const getMaxCell = useGetMaxCell();
 
   const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
 
   const scale_width = scrolling_config.scaleWidth;
+  const scale_split_count = scrolling_config.scaleCount;
 
   const [rows, setRow] = useState<any[]>([]);
 
-  const scale_split_count = 10;
 
   useEffect(() => {
     const cur = keyframes_area_ref.current as HTMLDivElement;
@@ -48,30 +50,13 @@ export function KeyframesValue(props: KeyframesValueParams) {
   }, []);
 
   useEffect(() => {
-    const max_time = config[ConfigMapKey.MAX_TIME];
-    const zoom_value = config[ConfigMapKey.ZOOM_VALUE];
 
-    const all_values = tableList.reduce((result: number[], cur) => {
-      const values = cur.keyframesInfo.map(v => v.value);
-      return result.concat(values);
-    }, []);
-
-    const target_max_time = Math.max(...all_values, max_time);
-
-    // 目前是 1
-    const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-    // 目前的缩放值
-
-    const cap = zoom_value * 1000 / scale_split_count;
-
-    const count = target_max_time / cap;
+    const count = getMaxCell();
     const page = (count - 1) / (getPageSize() + 1);
-
     const clientWidth = scrolling_config.dom ? scrolling_config.dom.clientWidth : 1;
-
     const totalLen = page * clientWidth;
     scrolling_config.length = totalLen;
-    const targetDom = scroll_ref.current as HTMLDivElement;
+    const targetDom = keyframes_area_ref.current as HTMLDivElement;
     targetDom.style.width = `${totalLen}px`;
     scrolling_config.clientWidth = clientWidth;
 
@@ -92,34 +77,16 @@ export function KeyframesValue(props: KeyframesValueParams) {
   ]);
 
 
-  const getRenderCellCount = (scrollLeft: number) => {
-    const scrolling_config = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-    const max_width = scrolling_config.clientWidth;
-    const scroll_left = scrollLeft;
-    const scrollWidth = ceil(scrolling_config.scrollWidth);
 
-    const target_width = ceil(max_width - (scrollWidth || 0), 2);
-    let coefficient = scroll_left / target_width;
-
-    const start_idx = Math.floor(coefficient * max_cell);
-    const cur = keyframes_area_ref.current as HTMLElement;
-    const end_idx = start_idx + Math.floor(cur.clientWidth / getcolumnwidth());
-
-    return {
-      start_idx,
-      end_idx
-    }
-
-  }
 
   const scrollLeftEffect = (screenLeft: number) => {
     const rows: any[] = [];
 
     let map = new Map<number, number>();
     const cur_zoom = config[ConfigMapKey.ZOOM_VALUE];
-    const { start_idx, end_idx } = getRenderCellCount(screenLeft);
+    const { startIdx, endIdx } = getRenderCellCount(screenLeft, max_cell);
 
-    for (let idx = start_idx; idx < end_idx; idx++) {
+    for (let idx = startIdx; idx < endIdx; idx++) {
       const showLabel = idx % scale_split_count == 0;
       const time_idx = 1000 * cur_zoom * idx / scale_split_count;
       const label = ceil(time_idx / 1000, 3);
@@ -143,21 +110,13 @@ export function KeyframesValue(props: KeyframesValueParams) {
     scrolling_config.scrollLeft,
   ]);
 
-  useEffect(() => {
-    const { start_idx } = getRenderCellCount(scrolling_config.scrollLeft);
-    const cur = keyframes_area_ref.current as HTMLDivElement;
-    const scrollLeft = getcolumnwidth() * (start_idx);
-    throttleScrollLeft(cur, scrollLeft);
-  }, [scrolling_config.scrollLeft]);
-
-
   const getcolumnwidth = () => {
     return scale_width / scale_split_count;
   }
 
   const getPageSize = () => {
-    const cur = keyframes_area_ref.current as HTMLElement;
-    return cur.offsetWidth / getcolumnwidth();
+    const cur = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig
+    return cur.clientWidth / getcolumnwidth();
   }
 
   const onClick = (e: MouseEvent<HTMLDivElement>) => {
@@ -183,7 +142,6 @@ export function KeyframesValue(props: KeyframesValueParams) {
   return (
 
     <div className='keyframes_values'
-
       ref={keyframes_area_ref} onScroll={onScroll} onClick={onClick}>
       <div ref={scroll_ref} >
         {

@@ -1,10 +1,10 @@
 import React, { useEffect } from 'react';
-import { AnimationTimelineArea } from '../AnimationTimelineArea';
+import { AnimationTimelineArea } from '../AnimationTimeline';
 import { AnimationTimelineBoxParams } from './types/AnimationTimelineBox';
 import { useAtom } from 'jotai';
 import { AnimationData } from '../jotai/AnimationData';
 import { AnimationTimelineHeader } from '../AnimationTimelineHeader';
-import { AnimationTimeLineFooter } from '../AnimationTimelineArea/AnimationFooter';
+import { AnimationTimeLineFooter } from '../AnimationTimeline/AnimationFooter';
 
 export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
 

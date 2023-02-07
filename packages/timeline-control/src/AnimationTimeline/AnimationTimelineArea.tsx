@@ -3,17 +3,26 @@ import React, { useEffect, useRef, useState, WheelEvent } from 'react';
 import { KeyframesArea } from './KeyframesArea';
 import { KeyframesValue } from './KeyframesValue';
 import { TimeValueMapContext } from './jotai/timeValue';
-import { clamp } from 'lodash';
+import { clamp, throttle } from 'lodash';
 import { useAtomAnimationConfig } from '../jotai';
-import { ConfigMapKey, ITimeLineConfig } from '../jotai/AnimationData';
+import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
+import { useGetcolumnwidth, useGetMaxCell, useGetRenderCellCount } from './utils/useGetRenderCellCount';
+import { DomUtils } from '../utils/dom';
 
 
+const throttleScrollLeft = throttle(DomUtils.setDomScrollLeft, 1000 / 24);
 export function AnimationTimelineArea() {
 
   const [config, setConfig] = useAtomAnimationConfig();
+  const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+
   const [timeMap, setTimeMap] = useState(new Map());
   const [boxWidth, setBoxWidth] = useState(0);
+
+  const getRenderCellCount = useGetRenderCellCount();
+  const getMaxCell = useGetMaxCell();
+  const getColumnwidth = useGetcolumnwidth();
 
   const [zoom, setZoom] = useState(1);
   const doKeyCode = useRef('');
@@ -54,6 +63,12 @@ export function AnimationTimelineArea() {
 
   }, [])
 
+  useEffect(() => {
+    const { startIdx } = getRenderCellCount(scrollingConfig.scrollLeft, getMaxCell());
+    const cur = keyframes_area_ref.current as HTMLDivElement;
+    const scrollLeft = getColumnwidth() * (startIdx);
+    throttleScrollLeft(cur, scrollLeft);
+  }, [scrollingConfig.scrollLeft]);
 
   useEffect(() => {
     if (keyframes_area_ref.current) {

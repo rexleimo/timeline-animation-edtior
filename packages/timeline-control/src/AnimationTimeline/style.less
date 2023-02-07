@@ -1,6 +1,7 @@
 .keyframes_area_box{
   min-height: 300px;
-  overflow: hidden;
+  width: 100%;
+  overflow: scroll;
   outline: none;
   position: relative;
 }
@@ -67,13 +68,8 @@
 .keyframes_values{
   position: relative;
   height: 40px;
-  overflow: scroll;
   width: 100%;
   padding-top: 20px;
-
-  &::-webkit-scrollbar{
-    // display: none !important;
-  }
   
   &_cell{
     position: absolute;
@@ -88,6 +84,7 @@
       color: #333;
     }
   }
+  
   &:hover{
     cursor: pointer;
   }

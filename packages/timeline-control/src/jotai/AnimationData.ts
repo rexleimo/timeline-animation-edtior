@@ -1,5 +1,5 @@
 import { atom, useAtom, useAtomValue } from 'jotai';
-import { KeyframesRowControlParams } from '../AnimationTimelineArea/types/KeyframesRowControlParams';
+import { KeyframesRowControlParams } from '../AnimationTimeline/types/KeyframesRowControlParams';
 
 export enum ConfigMapKey {
   ZOOM_OPTION,
@@ -17,6 +17,7 @@ export interface IScrollingConfig {
   dom: HTMLDivElement;
   clientWidth: number;
   scaleWidth: number;
+  scaleCount: number;
   scaleDefaultWidth: number;
   page: {
     limit: number,
@@ -38,11 +39,13 @@ const DefualtMaxTime = 20 * 1000;
 
 export const AnimationData = atom<KeyframesRowControlParams[]>([]);
 const scaleDefaultWidth = 100;
+const scaleDefaultConut = 10;
 const ScrollingConfig = {
   length: 0,
   scrollLeft: 0,
   scaleWidth: scaleDefaultWidth,
   scaleDefaultWidth,
+  scaleCount: scaleDefaultConut
 };
 
 export interface ITimeLineConfig {
