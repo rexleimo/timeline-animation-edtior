@@ -45,8 +45,8 @@ export function useGetMaxCell() {
   const [config] = useAtomAnimationConfig();
   const [tableList] = useAnimationData();
 
-  return () => {
-    const maxTime = config[ConfigMapKey.MAX_TIME];
+  return (timestamp?: number) => {
+    const maxTime = timestamp ? timestamp : config[ConfigMapKey.MAX_TIME];
     const zoomValue = config[ConfigMapKey.ZOOM_VALUE];
 
     const all_values = tableList.reduce((result: number[], cur) => {

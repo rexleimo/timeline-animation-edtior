@@ -21,7 +21,7 @@ export interface IScrollingConfig {
   scaleDefaultWidth: number;
   page: {
     limit: number,
-    current: number,
+    current?: number,
     total: number,
   }
 }
