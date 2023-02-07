@@ -1,18 +1,14 @@
-import React, { useContext, useEffect, useRef, MouseEvent, useCallback } from "react";
+import React, { useEffect, useRef, MouseEvent, useCallback } from "react";
 import './style.less';
 import { useAtomValue } from "jotai";
 import CurClientXEvents from "../jotai/curClientXEvnet";
-import { useAtomAnimationConfig } from "../../jotai";
-import { ConfigMapKey, IScrollingConfig } from "../../jotai/AnimationData";
-import { setConfigValue } from "../../utils/setConfigValue";
-import { clamp } from 'lodash';
 import { useAnimationTimeMap, useAnimationTimeScrollLeft } from "../../jotai/AnimationTimeMap";
+import { AnimationMoveLineParams } from "../types/AnimationMoveLineParams";
 
-export function AnimationMoveLine() {
+export function AnimationMoveLine(props: AnimationMoveLineParams) {
   const clientX = useAtomValue(CurClientXEvents);
-  const [config, setConfig] = useAtomAnimationConfig();
 
-  const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+  const { height } = props;
 
   const [timeMap] = useAnimationTimeMap();
   const [timeLineScrollLeft] = useAnimationTimeScrollLeft();
@@ -71,8 +67,10 @@ export function AnimationMoveLine() {
     timeMapRef.current = timeMap;
   }, [timeMap])
 
+
+
   return (
-    <div className="animation_move_lien" ref={lineRef}>
+    <div className="animation_move_lien" ref={lineRef} style={{ height: height - 42 - 20 }}>
       <div className="cap" onMouseDown={onMouseDown}></div>
     </div>
   );

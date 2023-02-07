@@ -1,5 +1,4 @@
 .keyframes_area_box{
-  min-height: 300px;
   width: 100%;
   overflow: scroll;
   outline: none;
@@ -36,33 +35,26 @@
       z-index: 1;
       cursor: pointer;
     }
-
-    .control_btn{
-      position: absolute;
-      top: 50%;
-      width: 10px;
-      height: 10px;
-      border: 1px solid #6100ff;
-      background-color: #fff;
-      z-index: 2;
-      &.left_btn{
-        left: 0;
-        transform: translateX(-50%) translateY(-50%) rotate(45deg);
-      }
-      &.right_btn{
-        right: 0;
-        transform: translateX(50%) translateY(-50%) rotate(45deg);
-      }
-      &.active{
-        background-color: #6100ff; 
-      }
-      &:hover{
-        cursor: pointer;
-        background-color: #6100ff;
-      }
-    }
-
   }
+
+  .control_btn{
+    position: absolute;
+    top: 50%;
+    width: 10px;
+    height: 10px;
+    border: 1px solid #6100ff;
+    background-color: #fff;
+    z-index: 2;
+    transform: translateY(-50%) rotate(45deg);
+    &.active{
+      background-color: #6100ff; 
+    }
+    &:hover{
+      cursor: pointer;
+      background-color: #6100ff;
+    }
+  }
+
 }
 
 .keyframes_values{

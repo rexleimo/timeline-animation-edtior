@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { AnimationTimelineArea } from '../AnimationTimeline';
 import { AnimationTimelineBoxParams } from './types/AnimationTimelineBox';
 import { useAtom } from 'jotai';
@@ -10,6 +10,8 @@ import { AnimationMoveLine } from '../AnimationTimeline/AnimationMoveLine';
 export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
 
   const [, setRow] = useAtom(AnimationData);
+  const ref = useRef(null);
+  const [lineHeight, setLineHeight] = useState(0);
 
   const { rows } = props;
 
@@ -17,12 +19,18 @@ export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
     setRow(rows);
   }, [rows])
 
+  useEffect(() => {
+    if (ref.current) {
+      setLineHeight((ref.current as HTMLDivElement).offsetHeight);
+    }
+  }, [ref])
+
   return (
-    <>
+    <div ref={ref}>
       <AnimationTimelineHeader />
       <AnimationTimelineArea />
       <AnimationTimeLineFooter />
-      <AnimationMoveLine />
-    </>
+      <AnimationMoveLine height={lineHeight} />
+    </div>
   );
 }

@@ -7,9 +7,6 @@ import { AnimationData, ConfigMapKey, useAtomAnimationConfig } from "../jotai/An
 
 export function KeyframesArea(props: KeyframesAreaParams) {
   const [row] = useAtom(AnimationData);
-  const [config] = useAtomAnimationConfig();
-
-  const zoom = config[ConfigMapKey.ZOOM_VALUE];
 
   const area_ref = useRef<HTMLDivElement>(null);
 
@@ -18,7 +15,10 @@ export function KeyframesArea(props: KeyframesAreaParams) {
       <div className="keyframes_area" ref={area_ref}>
         {
           row.map((r, idx) => {
-            return <KeyframesRowControl key={idx} zoom={zoom} keyframesInfo={r.keyframesInfo} />
+            return <KeyframesRowControl
+              idx={idx}
+              key={idx}
+              keyframesInfo={r.keyframesInfo} />
           })
         }
       </div>

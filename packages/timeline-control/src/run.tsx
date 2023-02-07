@@ -22,7 +22,7 @@ root.render(<AnimationTimelineBox rows={
           value: 100,
         },
         {
-          value: 2 * 1000
+          value: 1 * 1000 * 0.7
         }
       ]
     }

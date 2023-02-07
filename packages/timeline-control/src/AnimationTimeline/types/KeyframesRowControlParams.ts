@@ -2,5 +2,8 @@ import { KeyframesAreaParams } from "./KeyframesAreaParams";
 import { KeyframesData } from "./KeyframesData";
 
 export interface KeyframesRowControlParams extends KeyframesAreaParams {
-  keyframesInfo: KeyframesData[]
+  idx?: number;
+  keyframesInfo: KeyframesData[],
+  // onChange: (idx: number, time: number) => void
+
 }
