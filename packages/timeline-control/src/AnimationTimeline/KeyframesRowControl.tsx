@@ -95,6 +95,27 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     return resultX as number;
   }
 
+  function getTargetClientXCeil(val: KeyframesData): number {
+    const times = Array.from(timeMap.keys());
+    const values = Array.from(timeMap.values());
+    let resultX = 0;
+    for (let i = 0, j = times.length - 1; i < j; i++, j--) {
+      const valL = times[i];
+      const valR = times[j];
+      if (val.value <= valL) {
+        resultX = values[i];
+        break;
+      }
+
+      if (valR <= val.value) {
+        resultX = values[j + 1];
+        break;
+      }
+    }
+
+    return resultX;
+  }
+
   useEffect(() => {
 
     if (keyframesInfo.length === 0) return;
@@ -102,8 +123,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     const cur = controlRef.current as HTMLDivElement;
     const minPoint = minBy(keyframesInfo, (o) => o.value) as KeyframesData;
     const maxPoint = maxBy(keyframesInfo, (o) => o.value) as KeyframesData;
-    let startX = getTargetClientX(minPoint);
-    let endX = getTargetClientX(maxPoint);
+    let startX = getTargetClientXCeil(minPoint);
+    let endX = getTargetClientXCeil(maxPoint);
     let wdith = 0;
     if (VerifyNamespace.isUndefined(startX) && VerifyNamespace.isUndefined(endX)) {
       const timeCurMinLeft = Math.min(...timeMap.keys());
@@ -118,13 +139,16 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
         endX = 0;
       }
       wdith = endX - startX;
+      if (timeLineScrollLeft === 0 && VerifyNamespace.isNaN(wdith)) {
+        wdith = 0;
+      }
+
     } else {
       startX = VerifyNamespace.isUndefined(startX) ? 0 : startX;
       endX = VerifyNamespace.isUndefined(endX) ? timeConfig.clientWidth + timeLineScrollLeft + 50 : endX;
       wdith = endX - startX;
     }
 
-    console.log(wdith);
     cur.style.width = `${wdith}px`;
     cur.style.left = `${startX}px`;
   }, [zoom, timeMap])
@@ -134,16 +158,22 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     keyframesInfo.forEach((keyframe) => {
 
       let isShow = false;
-      let left = 0;
+      let left = -1000;
       const timeCurMinLeft = Math.min(...timeMap.keys());
       const timeCurMaxLeft = Math.max(...timeMap.keys());
+
       if (timeCurMinLeft > keyframe.value || timeCurMaxLeft < keyframe.value) {
         isShow = false;
       }
       else {
-        left = getTargetClientX(keyframe) - 5;
+        left = getTargetClientXCeil(keyframe) - 5;
+        // 如果匹配不到,走第二套匹配算法，就近原则
+        // if (VerifyNamespace.isNaN(left)) {
+        //   left = getTargetClientXCeil(keyframe);
+        // }
         isShow = true;
       }
+
 
       showList.push({
         left,
@@ -184,7 +214,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
               classNames('control_btn')
             }
             style={{
-              left: keyframe.isShow ? keyframe.left : -1000
+              left: !isNaN(keyframe.left) ? keyframe.left : -1000
             }}
             onMouseDown={(e) => onMouseDown(e, idx)}></div>
         })

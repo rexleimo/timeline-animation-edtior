@@ -48,7 +48,6 @@ export function useGetMaxCell() {
   return (timestamp?: number) => {
     const maxTime = timestamp ? timestamp : config[ConfigMapKey.MAX_TIME];
     const zoomValue = config[ConfigMapKey.ZOOM_VALUE];
-
     const all_values = tableList.reduce((result: number[], cur) => {
       const values = cur.keyframesInfo.map(v => v.value);
       return result.concat(values);

@@ -83,7 +83,6 @@ export function AnimationTimelineArea() {
   const onScroll = (ev: UIEvent<HTMLDivElement>) => {
     const target = ev.target as HTMLDivElement;
     const scrollLeft = target.scrollLeft;
-    console.log("ScrolleLeft...", scrollLeft);
     setTimeLineScrollerLeft(scrollLeft);
   }
 

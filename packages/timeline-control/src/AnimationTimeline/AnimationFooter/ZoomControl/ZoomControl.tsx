@@ -37,12 +37,11 @@ export function ZoomControl() {
       axis.style.left = `${left}px`;
 
       const zoomControlOption = config[ConfigMapKey.ZOOM_OPTION] as ConfigMapKeyNumValueNum;
-      const percentage = Math.ceil(left / offsetWidth * 100)
-
-      const option = zoomControlOptionHandle(percentage);
+      const percentage = left / offsetWidth;
+      const targetOption = Math.ceil(percentage * 100);
+      const option = zoomControlOptionHandle(targetOption);
       const targetZoom = zoomControlOption[option];
-
-      scrolling_config.scaleWidth = startScaleWidth + percentage * 2;
+      scrolling_config.scaleWidth = startScaleWidth + ceil(percentage, 2);
       setConfigValue(setConfig, {
         [ConfigMapKey.ZOOM_VALUE]: targetZoom,
         [ConfigMapKey.SCROLLING]: scrolling_config

@@ -59,14 +59,15 @@ export function KeyframesValue(props: KeyframesValueParams) {
     setConfigValue(setConfig, scrollingConfig);
     return {
       limit: getColumnwidth(),
-      total: page
+      total: page,
+      count
     }
   }
 
   useEffect(() => {
-    const { total: count } = getCellHandle();
+    const { count } = getCellHandle();
     setMaxCell(Math.floor(count));
-  }, [config[ConfigMapKey.ZOOM_VALUE], tableList.length]);
+  }, [config[ConfigMapKey.ZOOM_VALUE], tableList.length, scrollingConfig.scaleWidth]);
 
   useEffect(() => {
     const { total, limit } = getCellHandle();
