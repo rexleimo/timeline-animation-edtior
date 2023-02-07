@@ -1,13 +1,14 @@
 import React, { MouseEvent, useRef, useEffect, useContext, useState } from 'react';
 import './style.less';
 import { KeyframesRowControlParams } from './types/KeyframesRowControlParams';
-import { maxBy, minBy } from 'lodash';
+import { isUndefined, maxBy, minBy } from 'lodash';
 import { KeyframesData } from './types/KeyframesData';
 import { useAnimationTimeMap, useAnimationTimeScrollLeft } from '../jotai/AnimationTimeMap';
 import { useAtomAnimationConfig } from '../jotai';
-import { ConfigMapKey, IScrollingConfig } from '../jotai/AnimationData';
+import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from '../jotai/AnimationData';
 import classNames from 'classnames';
 import { useGetcolumnwidth } from './utils/useGetRenderCellCount';
+import { VerifyNamespace } from '../utils/verify';
 
 export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const { keyframesInfo, idx } = props;
@@ -17,16 +18,15 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const [timeLineScrollLeft] = useAnimationTimeScrollLeft();
   const zoom = config[ConfigMapKey.ZOOM_VALUE];
 
-  const getColumnWidth = useGetcolumnwidth()
-
 
   const curRef = useRef<HTMLDivElement>(null);
   const controlRef = useRef<HTMLDivElement>(null);
   const timeLineScrollLeftRef = useRef(0);
 
   const scrollConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
-  const [lists, setLists] = useState<any[]>([]);
+  const timeConfig = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
 
+  const [lists, setLists] = useState<any[]>([]);
 
 
   const onMouseRight = (e: MouseEvent<HTMLDivElement>) => {
@@ -105,7 +105,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     let startX = getTargetClientX(minPoint);
     let endX = getTargetClientX(maxPoint);
     let wdith = 0;
-    if (isNaN(startX) && isNaN(endX)) {
+    if (VerifyNamespace.isUndefined(startX) && VerifyNamespace.isUndefined(endX)) {
       const timeCurMinLeft = Math.min(...timeMap.keys());
       const timeCurMaxLeft = Math.max(...timeMap.keys());
       // 不在区域的操作
@@ -113,26 +113,25 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
         startX = 0;
       }
       if (timeCurMaxLeft < maxPoint.value) {
-        endX = 10000;
+        endX = timeConfig.clientWidth + timeLineScrollLeft + 50;
+      } else {
+        endX = 0;
       }
-
       wdith = endX - startX;
     } else {
-      startX = isNaN(startX) ? 0 : startX;
-      endX = isNaN(endX) ? 10000 : endX;
+      startX = VerifyNamespace.isUndefined(startX) ? 0 : startX;
+      endX = VerifyNamespace.isUndefined(endX) ? timeConfig.clientWidth + timeLineScrollLeft + 50 : endX;
       wdith = endX - startX;
     }
 
-    const scale = getColumnWidth();
     console.log(wdith);
     cur.style.width = `${wdith}px`;
-    cur.style.left = `${startX + scale}px`;
+    cur.style.left = `${startX}px`;
   }, [zoom, timeMap])
 
   useEffect(() => {
     const showList: any[] = [];
     keyframesInfo.forEach((keyframe) => {
-      const scale = getColumnWidth();
 
       let isShow = false;
       let left = 0;
@@ -142,7 +141,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
         isShow = false;
       }
       else {
-        left = getTargetClientX(keyframe) - 5 + scale;
+        left = getTargetClientX(keyframe) - 5;
         isShow = true;
       }
 
