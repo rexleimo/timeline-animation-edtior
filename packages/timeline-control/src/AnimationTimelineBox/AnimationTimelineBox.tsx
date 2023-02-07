@@ -5,6 +5,7 @@ import { useAtom } from 'jotai';
 import { AnimationData } from '../jotai/AnimationData';
 import { AnimationTimelineHeader } from '../AnimationTimelineHeader';
 import { AnimationTimeLineFooter } from '../AnimationTimeline/AnimationFooter';
+import { AnimationMoveLine } from '../AnimationTimeline/AnimationMoveLine';
 
 export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
 
@@ -21,6 +22,7 @@ export function AnimationTimelineBox(props: AnimationTimelineBoxParams) {
       <AnimationTimelineHeader />
       <AnimationTimelineArea />
       <AnimationTimeLineFooter />
+      <AnimationMoveLine />
     </>
   );
 }

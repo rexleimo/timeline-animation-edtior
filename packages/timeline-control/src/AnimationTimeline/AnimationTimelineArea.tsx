@@ -1,24 +1,23 @@
 import './style.less';
-import React, { useEffect, useRef, useState, WheelEvent } from 'react';
+import React, { useEffect, useRef, useState, WheelEvent, UIEvent } from 'react';
 import { KeyframesArea } from './KeyframesArea';
 import { KeyframesValue } from './KeyframesValue';
-import { TimeValueMapContext } from './jotai/timeValue';
 import { clamp, throttle } from 'lodash';
 import { useAtomAnimationConfig } from '../jotai';
 import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
 import { useGetcolumnwidth, useGetMaxCell, useGetRenderCellCount } from './utils/useGetRenderCellCount';
 import { DomUtils } from '../utils/dom';
+import { useAnimationTimeScrollLeft } from '../jotai/AnimationTimeMap';
 
 
 const throttleScrollLeft = throttle(DomUtils.setDomScrollLeft, 1000 / 24);
 export function AnimationTimelineArea() {
 
   const [config, setConfig] = useAtomAnimationConfig();
-  const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
+  const [timeLineScrollLeft, setTimeLineScrollerLeft] = useAnimationTimeScrollLeft();
 
-  const [timeMap, setTimeMap] = useState(new Map());
-  const [boxWidth, setBoxWidth] = useState(0);
+  const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
 
   const getRenderCellCount = useGetRenderCellCount();
   const getMaxCell = useGetMaxCell();
@@ -80,15 +79,20 @@ export function AnimationTimelineArea() {
     }
   }, [keyframes_area_ref])
 
+  const onScroll = (ev: UIEvent<HTMLDivElement>) => {
+    const target = ev.target as HTMLDivElement;
+    const scrollLeft = target.scrollLeft;
+    setTimeLineScrollerLeft(scrollLeft);
+  }
+
 
   return (
-    <TimeValueMapContext.Provider value={{ timeMap, setTimeMap, boxWidth, setBoxWidth }}>
-      <div tabIndex={0} className='keyframes_area_box' onWheel={onWheel} ref={keyframes_area_ref}>
-        <KeyframesValue />
-        <KeyframesArea />
-      </div>
-    </TimeValueMapContext.Provider>
-
+    <div tabIndex={0} className='keyframes_area_box'
+      onScroll={onScroll}
+      onWheel={onWheel} ref={keyframes_area_ref}>
+      <KeyframesValue />
+      <KeyframesArea />
+    </div>
   );
 
 }

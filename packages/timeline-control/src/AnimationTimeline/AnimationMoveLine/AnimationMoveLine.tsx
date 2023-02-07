@@ -1,21 +1,20 @@
 import React, { useContext, useEffect, useRef, MouseEvent } from "react";
 import './style.less';
-import { TimeValueMapContext } from '../jotai/timeValue'
 import { useAtomValue } from "jotai";
 import CurClientXEvents from "../jotai/curClientXEvnet";
 import { useAtomAnimationConfig } from "../../jotai";
-import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from "../../jotai/AnimationData";
+import { ConfigMapKey, IScrollingConfig } from "../../jotai/AnimationData";
 import { setConfigValue } from "../../utils/setConfigValue";
 import { clamp } from 'lodash';
+import { useAnimationTimeMap } from "../../jotai/AnimationTimeMap";
 
 export function AnimationMoveLine() {
   const clientX = useAtomValue(CurClientXEvents);
   const [config, setConfig] = useAtomAnimationConfig();
 
-  const maxTime = config[ConfigMapKey.MAX_TIME];
   const scrollingConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
 
-  const { timeMap } = useContext(TimeValueMapContext);
+  const [timeMap] = useAnimationTimeMap();
   const lineRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -37,6 +36,7 @@ export function AnimationMoveLine() {
       const targetLeft = startLeft + diff;
       let timeKey = 0;
       let calculationLeft = 0;
+      console.log(timeMap);
       // 向上取整 给 row
       for (const [key, val] of timeMap.entries()) {
         if (targetLeft <= val) {
@@ -46,6 +46,7 @@ export function AnimationMoveLine() {
           break;
         }
       }
+      console.log(timeKey);
     }
 
     document.onmouseup = () => {

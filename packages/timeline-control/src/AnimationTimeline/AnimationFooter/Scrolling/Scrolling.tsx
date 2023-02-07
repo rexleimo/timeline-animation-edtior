@@ -30,7 +30,7 @@ export function Scrolling() {
       setTimeout(() => {
         const control = cur.querySelector('.scrolling_control') as HTMLDivElement;
         scrolling_config.scrollWidth = control.offsetWidth;
-        setConfigValue(setConfig, scrolling_config);
+        // setConfigValue(setConfig, scrolling_config);
       }, 0);
     }
 

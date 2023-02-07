@@ -3,12 +3,12 @@ import './style.less';
 import { KeyframesRowControlParams } from './types/KeyframesRowControlParams';
 import { maxBy, minBy, throttle } from 'lodash';
 import { KeyframesData } from './types/KeyframesData';
-import { TimeValueMapContext } from './jotai/timeValue';
+import { useAnimationTimeMap } from '../jotai/AnimationTimeMap';
 
 export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const { zoom, keyframesInfo } = props;
 
-  const { timeMap } = useContext(TimeValueMapContext);
+  const [timeMap] = useAnimationTimeMap();
 
   const curRef = useRef<HTMLDivElement>(null);
   const controlRef = useRef<HTMLDivElement>(null);
@@ -52,7 +52,6 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     document.onmouseup = (e) => {
       document.onmousemove = null;
     }
-
 
   }
 
