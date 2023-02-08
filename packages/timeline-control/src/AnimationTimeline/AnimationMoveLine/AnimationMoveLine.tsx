@@ -4,11 +4,18 @@ import { useAtomValue } from "jotai";
 import CurClientXEvents from "../jotai/curClientXEvnet";
 import { useAnimationTimeMap, useAnimationTimeScrollLeft } from "../../jotai/AnimationTimeMap";
 import { AnimationMoveLineParams } from "../types/AnimationMoveLineParams";
+import { useAtomAnimationConfig } from "../../jotai";
+import { ConfigMapKey, ITimeLineConfig } from "../../jotai/AnimationData";
+import { setConfigValue } from "../../utils/setConfigValue";
 
 export function AnimationMoveLine(props: AnimationMoveLineParams) {
+
+  const [config, setConfig] = useAtomAnimationConfig();
+
   const clientX = useAtomValue(CurClientXEvents);
 
   const { height } = props;
+  const offsetLeft = 1;
 
   const [timeMap] = useAnimationTimeMap();
   const [timeLineScrollLeft] = useAnimationTimeScrollLeft();
@@ -21,13 +28,14 @@ export function AnimationMoveLine(props: AnimationMoveLineParams) {
   useEffect(() => {
     const left = timeMap.get(0) as number;
     const cur = lineRef.current as HTMLDivElement;
-    cur.style.left = `${Math.floor(left - 2)}px`;
+    cur.style.left = `${Math.floor(left)}px`;
   }, [lineRef, timeMap]);
 
   const onMouseDown = useCallback((e: MouseEvent<HTMLDivElement>) => {
     const startX = e.clientX;
     const cur = lineRef.current as HTMLElement;
     const startLeft = cur.offsetLeft;
+    let updateTimestamp = 0;
 
     document.onmousemove = (m) => {
       const endX = m.clientX;
@@ -35,20 +43,24 @@ export function AnimationMoveLine(props: AnimationMoveLineParams) {
       const targetLeft = timeLineScrollLeftRef.current + startLeft + diff;
       let timeKey = 0;
       let calculationLeft = 0;
-
       for (const [key, val] of timeMapRef.current.entries()) {
         if (targetLeft <= val) {
           timeKey = key;
           calculationLeft = val;
-          cur.style.left = `${val - 2 - timeLineScrollLeftRef.current}px`;
+          cur.style.left = `${val - offsetLeft - timeLineScrollLeftRef.current}px`;
           break;
         }
       }
-      console.log(timeKey);
+      updateTimestamp = timeKey;
     }
 
     document.onmouseup = () => {
       document.onmousemove = null;
+      const timeLineConfig = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
+      timeLineConfig.curTimestamp = updateTimestamp;
+      setConfigValue(setConfig, {
+        [ConfigMapKey.TIME_LINE]: timeLineConfig
+      })
     }
 
   }, [])
@@ -56,7 +68,7 @@ export function AnimationMoveLine(props: AnimationMoveLineParams) {
 
   useEffect(() => {
     const cur = lineRef.current as HTMLElement;
-    cur.style.left = `${clientX}px`;
+    cur.style.left = `${clientX - offsetLeft}px`;
   }, [clientX])
 
   useEffect(() => {
@@ -66,7 +78,6 @@ export function AnimationMoveLine(props: AnimationMoveLineParams) {
   useEffect(() => {
     timeMapRef.current = timeMap;
   }, [timeMap])
-
 
 
   return (

@@ -1,20 +1,22 @@
+@import url('../../common/styles/color.less');
+
 .animation_move_lien{
   position: absolute;
   height: calc(100%);
   top: 20px;
-  width: 4px;
-  background-color:#6100ff;
+  width: 1px;
+  background-color:@color_primary;
 
   ::after{
     content: ' ';
     position: absolute;
     width: 0;
     height: 0;
-    border-top: 16px solid #6100ff;
-    border-right: 16px solid transparent;
-    border-left: 16px solid transparent;
-    border-radius: 6px;
-    transform: translateX(calc(-13px));
+    border-top: 12px solid @color_primary;
+    border-right: 12px solid transparent;
+    border-left: 12px solid transparent;
+    border-radius: 50px;
+    transform: translateX(calc(-11px));
     cursor: pointer;
   }
       

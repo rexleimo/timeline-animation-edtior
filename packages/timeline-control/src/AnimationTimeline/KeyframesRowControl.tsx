@@ -188,7 +188,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
               classNames('control_btn')
             }
             style={{
-              left: !isNaN(keyframe.left) ? keyframe.left : -1000
+              left: !isNaN(keyframe.left) ? keyframe.left : -1000,
+              zIndex: idx
             }}
             onMouseDown={(e) => onMouseDown(e, idx)}></div>
         })

@@ -50,10 +50,12 @@ const ScrollingConfig = {
 
 export interface ITimeLineConfig {
   clientWidth: number;
+  curTimestamp: number;
 }
 
 const timeLineConfig = {
-  clientWidth: 0
+  clientWidth: 0,
+  curTimestamp: 0,
 }
 
 const animationConfigDataMap = {
