@@ -167,13 +167,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
       }
       else {
         left = getTargetClientXCeil(keyframe) - 5;
-        // 如果匹配不到,走第二套匹配算法，就近原则
-        // if (VerifyNamespace.isNaN(left)) {
-        //   left = getTargetClientXCeil(keyframe);
-        // }
         isShow = true;
       }
-
 
       showList.push({
         left,
