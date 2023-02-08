@@ -1,4 +1,4 @@
-import React, { useRef, useContext } from "react";
+import React, { useRef, useContext, useEffect } from "react";
 import { KeyframesRowControl } from "./KeyframesRowControl";
 import { KeyframesAreaParams } from "./types/KeyframesAreaParams";
 import { TimeValueMapContext } from './jotai/timeValue';
@@ -7,12 +7,19 @@ import { AnimationData, ConfigMapKey, useAtomAnimationConfig } from "../jotai/An
 
 export function KeyframesArea(props: KeyframesAreaParams) {
   const [row] = useAtom(AnimationData);
+  const [config] = useAtomAnimationConfig();
 
-  const area_ref = useRef<HTMLDivElement>(null);
+  const areaRef = useRef<HTMLDivElement>(null);
+  const scrollConfig = config[ConfigMapKey.SCROLLING];
+
+  useEffect(() => {
+    const cur = areaRef.current as HTMLDivElement;
+    cur.style.width = `${scrollConfig.length}px`;
+  }, [scrollConfig.length]);
 
   return (
     <>
-      <div className="keyframes_area" ref={area_ref}>
+      <div className="keyframes_area" ref={areaRef}>
         {
           row.map((r, idx) => {
             return <KeyframesRowControl

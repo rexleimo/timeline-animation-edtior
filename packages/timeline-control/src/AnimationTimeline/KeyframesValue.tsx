@@ -2,7 +2,7 @@ import React, { useRef, useEffect, useState, useContext, MouseEvent, UIEvent } f
 import { KeyframesValueCell } from './KeyframesValueCell';
 import './style.less';
 import KeyframesValueParams from './types/KeyframesValueParams';
-import { ceil, throttle } from 'lodash';
+import { ceil } from 'lodash';
 import { useAtom } from 'jotai';
 import CurClientXEvents from './jotai/curClientXEvnet';
 

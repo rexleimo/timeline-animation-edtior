@@ -23,7 +23,6 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const controlRef = useRef<HTMLDivElement>(null);
   const timeLineScrollLeftRef = useRef(0);
 
-  const scrollConfig = config[ConfigMapKey.SCROLLING] as IScrollingConfig;
   const timeConfig = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
 
   const [lists, setLists] = useState<any[]>([]);
@@ -53,37 +52,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
 
   }
 
-  const onMouseLeft = (e: MouseEvent<HTMLDivElement>) => {
-
-    const cur = e.target as HTMLDivElement;
-    cur.classList.add('active');
-
-    const control = controlRef.current as HTMLDivElement;
-    const startX = control.offsetLeft;
-
-    const startWidth = control.clientWidth;
-
-    document.onmousemove = (e) => {
-      const clientX = e.clientX;
-      const targetWidth = startX - clientX + startWidth;
-      control.style.width = `${targetWidth}px`;
-      control.style.left = `${clientX}px`;
-    }
-
-    document.onmouseup = (e) => {
-      cur.classList.remove('active');
-      document.onmousemove = null;
-      document.onmouseup = null;
-    }
-
-  }
-
   const onMouseDown = (e: MouseEvent<HTMLDivElement>, idx: number) => {
-    if (idx === 0) {
-      onMouseLeft(e)
-    } else if (idx === keyframesInfo.length - 1) {
-      onMouseRight(e);
-    }
+    onMouseRight(e);
   }
 
 
@@ -181,12 +151,6 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   useEffect(() => {
     timeLineScrollLeftRef.current = timeLineScrollLeft;
   }, [timeLineScrollLeft]);
-
-  useEffect(() => {
-    const cur = curRef.current as HTMLDivElement;
-    cur.style.width = `${scrollConfig.length}px`;
-  }, [scrollConfig.length]);
-
 
   return (
 
