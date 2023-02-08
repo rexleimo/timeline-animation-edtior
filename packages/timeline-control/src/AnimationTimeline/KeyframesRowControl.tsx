@@ -1,18 +1,17 @@
-import React, { MouseEvent, useRef, useEffect, useContext, useState, useCallback } from 'react';
+import React, { MouseEvent, useRef, useEffect, useState, useCallback } from 'react';
 import './style.less';
 import { KeyframesRowControlParams } from './types/KeyframesRowControlParams';
-import { isUndefined, maxBy, minBy } from 'lodash';
+import { maxBy, minBy } from 'lodash';
 import { KeyframesData } from './types/KeyframesData';
 import { useAnimationTimeMap, useAnimationTimeScrollLeft } from '../jotai/AnimationTimeMap';
 import { useAtomAnimationConfig } from '../jotai';
-import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from '../jotai/AnimationData';
+import { useAnimationData, ConfigMapKey, ITimeLineConfig } from '../jotai/AnimationData';
 import classNames from 'classnames';
-import { useGetcolumnwidth } from './utils/useGetRenderCellCount';
 import { VerifyNamespace } from '../utils/verify';
-import { DomUtils } from '../utils/dom';
 
 export function KeyframesRowControl(props: KeyframesRowControlParams) {
-  const { keyframesInfo, idx } = props;
+  const { keyframesInfo, idx: controlIdx } = props;
+  const [row, setRows] = useAnimationData();
 
   const [config] = useAtomAnimationConfig();
   const [timeMap] = useAnimationTimeMap();
@@ -30,47 +29,54 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const [lists, setLists] = useState<any[]>([]);
 
 
-  const onMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+  const onMouseMove = (e: MouseEvent<HTMLDivElement>, idx: number) => {
     const cur = e.target as HTMLDivElement;
     cur.classList.add('active');
-    const clientWidth = cur.offsetWidth;
-
+    let updateValue = 0;
     document.onmousemove = (e) => {
       const clientX = e.clientX;
-      const timeLeft = getTargetClientXCeilByLeft(clientX + timeLineScrollLeftRef.current);
+      const { resultX: timeLeft, resutTime } = getTargetClientXCeilByLeft(clientX + timeLineScrollLeftRef.current);
       console.log(timeLeft);
       cur.style.left = `${timeLeft - 5}px`;
+      updateValue = resutTime;
     }
 
     document.onmouseup = (e) => {
       document.onmousemove = null;
       cur.classList.remove('active');
+      console.log(controlIdx, idx);
+      row[controlIdx as number].keyframesInfo[idx].value = updateValue;
+      setRows(row);
+      console.log(row[controlIdx as number].keyframesInfo);
     }
 
   }
 
   const onMouseDown = useCallback((e: MouseEvent<HTMLDivElement>, idx: number) => {
-    onMouseMove(e);
+    onMouseMove(e, idx);
   }, [timeMap]);
 
   function getTargetClientXCeilByLeft(left: number) {
     const timeMap = timeMapRef.current;
     const values = Array.from(timeMap.values());
-    let resultX = 0;
+    const times = Array.from(timeMap.keys());
+    let resultX = 0, resutTime = 0;
     for (let i = 0, j = values.length - 1; i < j; i++, j--) {
       const valL = values[i];
       const valR = values[j];
       if (left <= valL) {
         resultX = values[i - 1];
+        resutTime = times[i - 1];
         break;
       }
 
       if (valR <= left) {
         resultX = values[j - 1];
+        resutTime = values[j - 1];
         break;
       }
     }
-    return resultX;
+    return { resultX, resutTime };
   }
 
   function getTargetClientXCeilByTime(val: KeyframesData): number {

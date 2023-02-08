@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useState, useContext, MouseEvent, UIEvent } from 'react';
+import React, { useRef, useEffect, useState, MouseEvent } from 'react';
 import { KeyframesValueCell } from './KeyframesValueCell';
 import './style.less';
 import KeyframesValueParams from './types/KeyframesValueParams';
@@ -8,7 +8,7 @@ import CurClientXEvents from './jotai/curClientXEvnet';
 
 import { ConfigMapKey, IScrollingConfig, ITimeLineConfig, useAnimationData, useAtomAnimationConfig } from '../jotai/AnimationData';
 import { setConfigValue } from '../utils/setConfigValue';
-import { useGetcolumnwidth, useGetMaxCell, useGetRenderCellCount, useScrollCompoentLeft } from './utils/useGetRenderCellCount';
+import { useGetcolumnwidth, useGetMaxCell } from './utils/useGetRenderCellCount';
 import { useAnimationTimeMap, useAnimationTimeScrollLeft } from '../jotai/AnimationTimeMap';
 
 
