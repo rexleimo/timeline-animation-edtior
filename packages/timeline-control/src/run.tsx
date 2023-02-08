@@ -1,0 +1,33 @@
+import './style.css';
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { AnimationTimelineBox } from './index';
+
+const root = ReactDOM.createRoot(document.getElementById("app") as HTMLElement);
+root.render(<AnimationTimelineBox rows={
+  [
+    {
+      keyframesInfo: [
+        {
+          value: 100,
+        },
+        {
+          value: 2000
+        },
+        {
+          value: 7000
+        }
+      ]
+    },
+    {
+      keyframesInfo: [
+        {
+          value: 100,
+        },
+        {
+          value: 80.005 * 1000
+        }
+      ]
+    }
+  ]
+} />);

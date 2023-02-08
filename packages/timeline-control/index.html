@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+
+  <title>Vite + TS</title>
+</head>
+
+<body>
+  <div id="app"></div>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script type="module" src="/src/run.tsx"></script>
+  <script>
+    document.addEventListener('mousewheel', function (e) {
+      e = e || window.event;
+      if ((e.wheelDelta && event.ctrlKey) || e.detail) {
+        event.preventDefault();
+      }
+    }, { capture: false, passive: false });
+    document.addEventListener('keydown', function (event) {
+      if ((event.ctrlKey === true || event.metaKey === true)
+        && (event.keyCode === 61 || event.keyCode === 107
+          || event.keyCode === 173 || event.keyCode === 109
+          || event.keyCode === 187 || event.keyCode === 189)) {
+        event.preventDefault();
+      }
+    }, false);
+  </script>
+</body>
+
+</html>

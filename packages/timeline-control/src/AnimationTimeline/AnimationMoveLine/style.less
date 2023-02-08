@@ -1,0 +1,20 @@
+@import url('../../common/styles/color.less');
+
+.animation_move_lien{
+  position: absolute;
+  height: calc(100%);
+  top: 32px;
+  width: 1px;
+  background-color:@color_primary;
+
+  &_icon{
+    position: absolute;
+    width: 0;
+    height: 0;
+    top: -10px;
+    fill: @color_primary;
+    transform: translateX(-5.5px);
+    cursor: pointer;
+  }
+      
+}
