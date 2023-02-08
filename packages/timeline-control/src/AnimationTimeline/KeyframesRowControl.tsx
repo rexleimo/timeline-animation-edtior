@@ -65,8 +65,9 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
       const valL = values[i];
       const valR = values[j];
       if (left <= valL) {
-        resultX = values[i - 1];
-        resutTime = times[i - 1];
+        const targetIdx = Math.max(0, i - 1);
+        resultX = values[targetIdx];
+        resutTime = times[targetIdx];
         break;
       }
 
@@ -111,7 +112,6 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     const minPoint = minBy(keyframesInfo, (o) => o.value) as KeyframesData;
     const maxPoint = maxBy(keyframesInfo, (o) => o.value) as KeyframesData;
     let startX = getTargetClientXCeilByTime(minPoint);
-    console.log(startX);
     let endX = getTargetClientXCeilByTime(maxPoint);
     let wdith = 0;
     if (VerifyNamespace.isUndefined(startX) && VerifyNamespace.isUndefined(endX)) {
