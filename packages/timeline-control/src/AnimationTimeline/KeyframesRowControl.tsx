@@ -1,4 +1,4 @@
-import React, { MouseEvent, useRef, useEffect, useContext, useState } from 'react';
+import React, { MouseEvent, useRef, useEffect, useContext, useState, useCallback } from 'react';
 import './style.less';
 import { KeyframesRowControlParams } from './types/KeyframesRowControlParams';
 import { isUndefined, maxBy, minBy } from 'lodash';
@@ -9,6 +9,7 @@ import { ConfigMapKey, IScrollingConfig, ITimeLineConfig } from '../jotai/Animat
 import classNames from 'classnames';
 import { useGetcolumnwidth } from './utils/useGetRenderCellCount';
 import { VerifyNamespace } from '../utils/verify';
+import { DomUtils } from '../utils/dom';
 
 export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const { keyframesInfo, idx } = props;
@@ -22,27 +23,23 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const curRef = useRef<HTMLDivElement>(null);
   const controlRef = useRef<HTMLDivElement>(null);
   const timeLineScrollLeftRef = useRef(0);
+  const timeMapRef = useRef<Map<number, number>>(new Map());
 
   const timeConfig = config[ConfigMapKey.TIME_LINE] as ITimeLineConfig;
 
   const [lists, setLists] = useState<any[]>([]);
 
 
-  const onMouseRight = (e: MouseEvent<HTMLDivElement>) => {
+  const onMouseMove = (e: MouseEvent<HTMLDivElement>) => {
     const cur = e.target as HTMLDivElement;
     cur.classList.add('active');
-
-    const control = controlRef.current as HTMLDivElement;
-
-    const startX = cur.clientLeft + cur.clientWidth / 2 - control.clientLeft;
-    const startWidth = cur.clientWidth;
+    const clientWidth = cur.offsetWidth;
 
     document.onmousemove = (e) => {
       const clientX = e.clientX;
-      const diff = clientX - startX;
-      const targetLeft = timeLineScrollLeftRef.current + startWidth + diff;
-      control.style.width = `${targetLeft - control.offsetLeft}px`;
-      cur.style.left = `${targetLeft}px`;
+      const timeLeft = getTargetClientXCeilByLeft(clientX + timeLineScrollLeftRef.current);
+      console.log(timeLeft);
+      cur.style.left = `${timeLeft - 5}px`;
     }
 
     document.onmouseup = (e) => {
@@ -52,20 +49,31 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
 
   }
 
-  const onMouseDown = (e: MouseEvent<HTMLDivElement>, idx: number) => {
-    onMouseRight(e);
-  }
+  const onMouseDown = useCallback((e: MouseEvent<HTMLDivElement>, idx: number) => {
+    onMouseMove(e);
+  }, [timeMap]);
 
-
-  function getTargetClientX(min: KeyframesData): number {
-    const times = Array.from(timeMap.keys());
-    const targetIdx = times.findIndex((v) => v === min.value);
+  function getTargetClientXCeilByLeft(left: number) {
+    const timeMap = timeMapRef.current;
     const values = Array.from(timeMap.values());
-    const resultX = values[targetIdx];
-    return resultX as number;
+    let resultX = 0;
+    for (let i = 0, j = values.length - 1; i < j; i++, j--) {
+      const valL = values[i];
+      const valR = values[j];
+      if (left <= valL) {
+        resultX = values[i - 1];
+        break;
+      }
+
+      if (valR <= left) {
+        resultX = values[j - 1];
+        break;
+      }
+    }
+    return resultX;
   }
 
-  function getTargetClientXCeil(val: KeyframesData): number {
+  function getTargetClientXCeilByTime(val: KeyframesData): number {
     const times = Array.from(timeMap.keys());
     const values = Array.from(timeMap.values());
     let resultX = 0;
@@ -93,8 +101,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     const cur = controlRef.current as HTMLDivElement;
     const minPoint = minBy(keyframesInfo, (o) => o.value) as KeyframesData;
     const maxPoint = maxBy(keyframesInfo, (o) => o.value) as KeyframesData;
-    let startX = getTargetClientXCeil(minPoint);
-    let endX = getTargetClientXCeil(maxPoint);
+    let startX = getTargetClientXCeilByTime(minPoint);
+    let endX = getTargetClientXCeilByTime(maxPoint);
     let wdith = 0;
     if (VerifyNamespace.isUndefined(startX) && VerifyNamespace.isUndefined(endX)) {
       const timeCurMinLeft = Math.min(...timeMap.keys());
@@ -136,7 +144,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
         isShow = false;
       }
       else {
-        left = getTargetClientXCeil(keyframe) - 5;
+        left = getTargetClientXCeilByTime(keyframe) - 5;
         isShow = true;
       }
 
@@ -150,7 +158,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
 
   useEffect(() => {
     timeLineScrollLeftRef.current = timeLineScrollLeft;
-  }, [timeLineScrollLeft]);
+    timeMapRef.current = timeMap;
+  }, [timeLineScrollLeft, timeMap]);
 
   return (
 
