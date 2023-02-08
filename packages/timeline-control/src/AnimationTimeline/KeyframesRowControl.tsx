@@ -8,6 +8,7 @@ import { useAtomAnimationConfig } from '../jotai';
 import { useAnimationData, ConfigMapKey, ITimeLineConfig } from '../jotai/AnimationData';
 import classNames from 'classnames';
 import { VerifyNamespace } from '../utils/verify';
+import { getOffsetLeft } from './utils/getOffsetLeft';
 
 export function KeyframesRowControl(props: KeyframesRowControlParams) {
   const { keyframesInfo, idx: controlIdx } = props;
@@ -36,20 +37,19 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     document.onmousemove = (e) => {
       const clientX = e.clientX;
       const { resultX: timeLeft, resutTime } = getTargetClientXCeilByLeft(clientX + timeLineScrollLeftRef.current);
-      console.log(timeLeft);
       cur.style.left = `${timeLeft - 5}px`;
       updateValue = resutTime;
+      const keyframesInfo = row[controlIdx as number].keyframesInfo;
+      keyframesInfo[idx].value = updateValue;
+      handeLineWidth(keyframesInfo);
     }
 
     document.onmouseup = (e) => {
       document.onmousemove = null;
       cur.classList.remove('active');
-      console.log(controlIdx, idx);
       row[controlIdx as number].keyframesInfo[idx].value = updateValue;
       setRows(row);
-      console.log(row[controlIdx as number].keyframesInfo);
     }
-
   }
 
   const onMouseDown = useCallback((e: MouseEvent<HTMLDivElement>, idx: number) => {
@@ -71,8 +71,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
       }
 
       if (valR <= left) {
-        resultX = values[j - 1];
-        resutTime = values[j - 1];
+        resultX = values[j + 1];
+        resutTime = times[j + 1];
         break;
       }
     }
@@ -80,6 +80,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
   }
 
   function getTargetClientXCeilByTime(val: KeyframesData): number {
+    const timeMap = timeMapRef.current;
     const times = Array.from(timeMap.keys());
     const values = Array.from(timeMap.values());
     let resultX = 0;
@@ -92,7 +93,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
       }
 
       if (valR <= val.value) {
-        resultX = values[j + 1];
+        resultX = values[j];
         break;
       }
     }
@@ -100,14 +101,17 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     return resultX;
   }
 
-  useEffect(() => {
-
-    if (keyframesInfo.length === 0) return;
+  // 处理线段
+  const handeLineWidth = (arr: KeyframesData[]) => {
+    if (arr.length === 0) return;
+    const timeMap = timeMapRef.current;
+    const timeLineScrollLeft = timeLineScrollLeftRef.current;
 
     const cur = controlRef.current as HTMLDivElement;
     const minPoint = minBy(keyframesInfo, (o) => o.value) as KeyframesData;
     const maxPoint = maxBy(keyframesInfo, (o) => o.value) as KeyframesData;
     let startX = getTargetClientXCeilByTime(minPoint);
+    console.log(startX);
     let endX = getTargetClientXCeilByTime(maxPoint);
     let wdith = 0;
     if (VerifyNamespace.isUndefined(startX) && VerifyNamespace.isUndefined(endX)) {
@@ -122,7 +126,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
       } else {
         endX = 0;
       }
-      wdith = endX - startX;
+
       if (timeLineScrollLeft === 0 && VerifyNamespace.isNaN(wdith)) {
         wdith = 0;
       }
@@ -130,16 +134,19 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
     } else {
       startX = VerifyNamespace.isUndefined(startX) ? 0 : startX;
       endX = VerifyNamespace.isUndefined(endX) ? timeConfig.clientWidth + timeLineScrollLeft + 50 : endX;
-      wdith = endX - startX;
     }
 
-    cur.style.width = `${wdith}px`;
-    cur.style.left = `${startX}px`;
-  }, [zoom, timeMap])
+    wdith = endX - startX - 5 * 2;
 
-  useEffect(() => {
+    cur.style.width = `${wdith}px`;
+    cur.style.left = `${startX + 5}px`;
+  }
+
+  //点的处理
+  const handleDotPositon = () => {
     const showList: any[] = [];
-    keyframesInfo.forEach((keyframe) => {
+
+    keyframesInfo.forEach((keyframe, idx) => {
 
       let isShow = false;
       let left = -1000;
@@ -150,7 +157,8 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
         isShow = false;
       }
       else {
-        left = getTargetClientXCeilByTime(keyframe) - 5;
+        const offsetLeft = getOffsetLeft(idx, keyframesInfo.length - 1);
+        left = getTargetClientXCeilByTime(keyframe) - offsetLeft;
         isShow = true;
       }
 
@@ -160,12 +168,15 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
       })
     });
     setLists(showList);
-  }, [timeMap, timeLineScrollLeft])
+  }
+
 
   useEffect(() => {
     timeLineScrollLeftRef.current = timeLineScrollLeft;
     timeMapRef.current = timeMap;
-  }, [timeLineScrollLeft, timeMap]);
+    handeLineWidth(keyframesInfo);
+    handleDotPositon();
+  }, [timeLineScrollLeft, timeMap, zoom]);
 
   return (
 
@@ -175,9 +186,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
         ref={controlRef}
       >
         <div className="line"></div>
-        {/* <div className="left_btn control_btn" ></div> */}
         {/* <div className="line" onMouseDown={moveControl}></div> */}
-        {/* <div className="right_btn control_btn" onMouseDown={onMouseDown}></div> */}
       </div>
 
       {
@@ -189,7 +198,7 @@ export function KeyframesRowControl(props: KeyframesRowControlParams) {
             }
             style={{
               left: !isNaN(keyframe.left) ? keyframe.left : -1000,
-              zIndex: idx
+              zIndex: idx + 10
             }}
             onMouseDown={(e) => onMouseDown(e, idx)}></div>
         })

@@ -12,7 +12,10 @@ root.render(<AnimationTimelineBox rows={
           value: 100,
         },
         {
-          value: 200
+          value: 2000
+        },
+        {
+          value: 7000
         }
       ]
     },

@@ -79,10 +79,19 @@ export function AnimationMoveLine(props: AnimationMoveLineParams) {
     timeMapRef.current = timeMap;
   }, [timeMap])
 
+  const prefix = (name?: string) => {
+    return `animation_move_lien${name || ''}`
+  }
 
   return (
-    <div className="animation_move_lien" ref={lineRef} style={{ height: height - 42 - 20 }}>
-      <div className="cap" onMouseDown={onMouseDown}></div>
+    <div className={prefix()} ref={lineRef} style={{ height: height - 42 - 20 }}>
+      <div className="cap" onMouseDown={onMouseDown}>
+        <div className={prefix('_icon')}>
+          <svg viewBox="0 0 2176 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="9675" width="12" height="12">
+            <path d="M380.928 398.08c-132.736-116.992-49.92-336 126.976-336h1156.48c176.896 0 259.584 218.88 126.976 336L1170.816 945.536a128 128 0 0 1-169.344 0L380.928 398.08z" p-id="9676"></path>
+          </svg>
+        </div>
+      </div>
     </div>
   );
 }

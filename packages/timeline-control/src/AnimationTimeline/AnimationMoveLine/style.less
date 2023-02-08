@@ -3,20 +3,17 @@
 .animation_move_lien{
   position: absolute;
   height: calc(100%);
-  top: 20px;
+  top: 32px;
   width: 1px;
   background-color:@color_primary;
 
-  ::after{
-    content: ' ';
+  &_icon{
     position: absolute;
     width: 0;
     height: 0;
-    border-top: 12px solid @color_primary;
-    border-right: 12px solid transparent;
-    border-left: 12px solid transparent;
-    border-radius: 50px;
-    transform: translateX(calc(-11px));
+    top: -10px;
+    fill: @color_primary;
+    transform: translateX(-5.5px);
     cursor: pointer;
   }
       
